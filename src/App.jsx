@@ -12,6 +12,16 @@ import Portefeuille from './pages/Portefeuille'
 import ModuleDetail from './pages/modules/ModuleDetail'
 import ModuleList from './pages/modules/ModuleList'
 import { LIST_MODULE_KEYS } from './pages/modules/ModuleList'
+import ResetPassword from './pages/ResetPassword'
+
+function ModuleRouter({ session }) {
+  const { groupeId, moduleId } = useParams()
+  const key = `${groupeId}-${moduleId}`
+  if (LIST_MODULE_KEYS.includes(key)) {
+    return <ModuleList session={session} />
+  }
+  return <ModuleDetail session={session} />
+}
 
 function PinLock({ onSuccess }) {
   const [pin, setPin] = useState('')
@@ -89,19 +99,12 @@ const s = {
   keyDel: { background:'transparent', boxShadow:'none', color:'#534AB7', fontSize:'20px' },
 }
 
-function ModuleRouter({ session }) {
-  const { groupeId, moduleId } = useParams()
-  const key = `${groupeId}-${moduleId}`
-  if (LIST_MODULE_KEYS.includes(key)) {
-    return <ModuleList session={session} />
-  }
-  return <ModuleDetail session={session} />
-}
 export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [locked, setLocked] = useState(true)
   const [unlockedBy, setUnlockedBy] = useState(null)
+  const [passwordRecovery, setPasswordRecovery] = useState(false)
 
   const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
   const pinCode = localStorage.getItem('mindesk_pin')
@@ -113,11 +116,13 @@ export default function App() {
     })
     supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecovery(true)
+      }
       if (!session) {
         setLocked(true)
         setUnlockedBy(null)
       }
-      // Si nouvelle connexion depuis Login (email ou bio) → pas de PIN lock
       if (event === 'SIGNED_IN' && locked) {
         setUnlockedBy('login')
         setLocked(false)
@@ -138,7 +143,10 @@ export default function App() {
     </div>
   )
 
-  // Session active + PIN + verrouillé + pas déverrouillé par login
+  if (passwordRecovery) {
+    return <ResetPassword onDone={() => setPasswordRecovery(false)} />
+  }
+
   if (session && pinActive && pinCode && locked && unlockedBy !== 'login') {
     return (
       <BrowserRouter>
@@ -147,7 +155,7 @@ export default function App() {
     )
   }
 
- return (
+  return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={
