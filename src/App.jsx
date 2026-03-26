@@ -12,7 +12,7 @@ import PinLogin from './pages/PinLogin'
 export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [pinVerified, setPinVerified] = useState(false)
+  const [locked, setLocked] = useState(true)
 
   const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
   const pinCode = localStorage.getItem('mindesk_pin')
@@ -24,7 +24,7 @@ export default function App() {
     })
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
-      if (session) setPinVerified(false)
+      if (!session) setLocked(true)
     })
   }, [])
 
@@ -41,11 +41,11 @@ export default function App() {
     </div>
   )
 
-  // Si connecté mais PIN actif et pas encore vérifié
-  if (session && pinActive && pinCode && !pinVerified) {
+  // PIN actif + session valide + app verrouillée
+  if (session && pinActive && pinCode && locked) {
     return (
       <BrowserRouter>
-        <PinLogin onSuccess={() => setPinVerified(true)} />
+        <PinLogin onSuccess={() => setLocked(false)} />
       </BrowserRouter>
     )
   }
@@ -53,7 +53,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={session ? <Home session={session} /> : <Login />} />
+        <Route path="/" element={session
+          ? <Home session={session} onLock={() => setLocked(true)} />
+          : <Login />}
+        />
         <Route path="/capture" element={session ? <Capture session={session} /> : <Navigate to="/" />} />
         <Route path="/galerie" element={session ? <Galerie session={session} /> : <Navigate to="/" />} />
         <Route path="/setup-pin" element={session ? <SetupPin /> : <Navigate to="/" />} />

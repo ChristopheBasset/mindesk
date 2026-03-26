@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BottomNav from '../components/BottomNav'
 
-export default function Home({ session }) {
+export default function Home({ session, onLock }) {
   const navigate = useNavigate()
   const [captures, setCaptures] = useState([])
   const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
@@ -133,18 +133,30 @@ export default function Home({ session }) {
       )}
 
       {!pinActive && (
-        <div style={s.logoutWrap}>
-          <button
-            onClick={() => navigate('/setup-pin')}
-            style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
-            🔐 Activer le code PIN
-          </button>
-        </div>
-      )}
+  <div style={s.logoutWrap}>
+    <button
+      onClick={() => navigate('/setup-pin')}
+      style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+      🔐 Activer le code PIN
+    </button>
+  </div>
+)}
 
-      <div style={s.logoutWrap}>
-        <button onClick={handleLogout} style={s.logoutBtn}>Deconnexion</button>
-      </div>
+{pinActive && (
+  <div style={s.logoutWrap}>
+    <button
+      onClick={() => onLock()}
+      style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+      🔒 Verrouiller
+    </button>
+  </div>
+)}
+
+<div style={s.logoutWrap}>
+  <button onClick={handleLogout} style={s.logoutBtn}>
+    Deconnexion complete
+  </button>
+</div>
 
       <BottomNav />
     </div>
