@@ -168,9 +168,12 @@ export default function ModuleDetail({ session }) {
           </div>
           <div style={s.title}>{config.label}</div>
         </div>
-        <button onClick={() => setMode(mode === 'edit' ? 'view' : 'edit')} style={s.editBtn}>
-          {mode === 'edit' ? '✕' : '✏️'}
-        </button>
+        {mode === 'edit' ? (
+          <button onClick={() => setMode('view')} style={s.editBtn}>✕</button>
+        ) : (
+          <button onClick={() => setMode('edit')}
+            style={{...s.addBtn, background: config.color}}>+</button>
+        )}
       </div>
 
       {/* ACCES DIRECTS */}
@@ -199,19 +202,26 @@ export default function ModuleDetail({ session }) {
 
       {mode === 'view' ? (
         <div style={s.viewWrap}>
-          {!data ? (
+          {!data && (
             <div style={s.empty}>
               <div style={{fontSize:'40px', marginBottom:'12px'}}>📋</div>
               <div style={s.emptyTitle}>Aucune information</div>
-              <div style={s.emptySub}>Appuie sur ✏️ pour renseigner ce module</div>
+              <div style={s.emptySub}>Appuie sur + pour renseigner ce module</div>
               <button onClick={() => setMode('edit')}
                 style={{...s.saveBtn, background: config.color, marginTop:'16px'}}>
                 Renseigner maintenant
               </button>
             </div>
-          ) : (
+          )}
+          {data && accesDirects.length === 0 && (
+            <div style={s.empty}>
+              <div style={{fontSize:'32px', marginBottom:'8px'}}>🔗</div>
+              <div style={s.emptySub}>Ajoute un lien direct via le bouton +</div>
+            </div>
+          )}
+          {false && (
             <div style={s.fields}>
-              {config.fields.filter(f => !f.sensitive && f.type !== 'separator' && data.champs?.[f.key]).map((f, i, arr) => (
+              {config.fields.filter(f => !f.sensitive && f.type !== 'separator' && data?.champs?.[f.key]).map((f, i, arr) => (
                 <div key={f.key} style={{...s.fieldRow,
                   borderBottom: i < arr.length-1 ? '1px solid rgba(0,0,0,0.05)' : 'none'}}>
                   <div style={s.fieldLabel}>{f.label}</div>
@@ -668,6 +678,10 @@ const s = {
   title: { fontSize: '15px', fontWeight: '700', color: '#1a1510' },
   editBtn: { background: 'none', border: 'none', fontSize: '16px',
     cursor: 'pointer', padding: '4px 8px' },
+  addBtn: { width: '32px', height: '32px', borderRadius: '50%', border: 'none',
+    color: 'white', fontSize: '20px', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontWeight: '400', lineHeight: 1 },
   accessCard: { margin: '10px 14px 0', background: 'white', borderRadius: '14px',
     padding: '12px 14px', display: 'flex', alignItems: 'center',
     justifyContent: 'space-between', border: '1.5px solid',
