@@ -11,7 +11,46 @@ export default function ModuleDetail({ session }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({})
-
+const LIENS_PREDEFINIS = {
+  'charges-energie': [
+    { label: 'EDF',        url: 'https://particulier.edf.fr/fr/accueil/espace-client/tableau-de-bord.html' },
+    { label: 'Engie',      url: 'https://particuliers.engie.fr/espace-client' },
+    { label: 'Total Energies', url: 'https://www.totalenergies-particuliers.fr/espace-client' },
+    { label: 'Ekwateur',   url: 'https://app.ekwateur.fr' },
+  ],
+  'charges-operateur': [
+    { label: 'SFR',        url: 'https://www.sfr.fr/mon-espace-sfr' },
+    { label: 'Orange',     url: 'https://espaceclient.orange.fr' },
+    { label: 'Free',       url: 'https://mobile.free.fr/account' },
+    { label: 'Bouygues',   url: 'https://www.bouyguestelecom.fr/mon-compte' },
+    { label: 'Free Fibre', url: 'https://adsl.free.fr/login.pl' },
+  ],
+  'charges-impots': [
+    { label: 'Impots.gouv', url: 'https://cfspart.impots.gouv.fr' },
+  ],
+  'assurances-secu': [
+    { label: 'Ameli',      url: 'https://assure.ameli.fr' },
+  ],
+  'assurances-mutuelle': [
+    { label: 'Harmonie',   url: 'https://www.harmonie-mutuelle.fr/espace-client' },
+    { label: 'MGEN',       url: 'https://www.mgen.fr/mon-espace-perso' },
+    { label: 'Malakoff',   url: 'https://www.malakoffhumanis.com/espace-client' },
+    { label: 'Alan',       url: 'https://alan.com/fr-fr' },
+  ],
+  'assurances-biens': [
+    { label: 'AXA',        url: 'https://www.axa.fr/mon-espace-client' },
+    { label: 'MAIF',       url: 'https://www.maif.fr/espace-client' },
+    { label: 'MACIF',      url: 'https://www.macif.fr/assurance/particuliers/espace-client' },
+    { label: 'Groupama',   url: 'https://www.groupama.fr/espace-client' },
+  ],
+  'loisirs-licences': [
+    { label: 'Netflix',    url: 'https://www.netflix.com/browse' },
+    { label: 'Spotify',    url: 'https://www.spotify.com/fr/account' },
+    { label: 'Disney+',    url: 'https://www.disneyplus.com/fr-fr' },
+    { label: 'Canal+',     url: 'https://www.canalplus.com/espace-client' },
+    { label: 'Amazon Prime',url: 'https://www.amazon.fr/gp/css/homepage.html' },
+  ],
+}
   const config = getModuleConfig(groupeId, moduleId)
 
   useEffect(() => { loadData() }, [])
