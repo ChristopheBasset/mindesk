@@ -408,4 +408,182 @@ function getModuleConfig(groupeId, moduleId) {
       ]
     },
     'documents-justifs': {
-      label:
+      label: 'Justificatifs', groupLabel: 'Documents',
+      color: '#5F5E5A', bgLight: '#F1EFE8',
+      icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6',
+      fields: [
+        { key: 'type',     label: 'Type',    placeholder: 'Facture, quittance...' },
+        { key: 'emetteur', label: 'Emetteur',placeholder: 'EDF, proprietaire...' },
+        { key: 'date',     label: 'Date',    type: 'date' },
+        { key: 'notes',    label: 'Notes',   placeholder: 'Details...' },
+      ]
+    },
+    'portefeuille-cb': {
+      label: 'Cartes bancaires', groupLabel: 'Portefeuille',
+      color: '#1D9E75', bgLight: '#E1F5EE',
+      icon: 'M2 5h20v14H2zM2 10h20',
+      fields: [
+        { key: 'banque',            label: 'Banque',              placeholder: 'BNP, Credit Agricole...' },
+        { key: 'derniers_chiffres', label: '4 derniers chiffres', placeholder: '4242', type: 'number' },
+        { key: 'type',              label: 'Type',                placeholder: 'Visa, Mastercard...' },
+        { key: 'expiration',        label: 'Expiration',          placeholder: 'MM/AA' },
+      ]
+    },
+    'portefeuille-placements': {
+      label: 'Placements', groupLabel: 'Portefeuille',
+      color: '#1D9E75', bgLight: '#E1F5EE',
+      icon: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
+      fields: [
+        { key: 'etablissement', label: 'Etablissement', placeholder: 'Banque, assureur...' },
+        { key: 'type',          label: 'Type',          placeholder: 'Livret A, PEL, PEA...' },
+        { key: 'solde',         label: 'Solde (€)',     placeholder: '5000', type: 'number' },
+        { key: 'taux',          label: 'Taux (%)',      placeholder: '3', type: 'number' },
+      ]
+    },
+    'portefeuille-budget': {
+      label: 'Budget', groupLabel: 'Portefeuille',
+      color: '#1D9E75', bgLight: '#E1F5EE',
+      icon: 'M3 3h18v18H3zM3 9h18M9 21V9',
+      fields: [
+        { key: 'revenus',        label: 'Revenus mensuels (€)',  placeholder: '2500', type: 'number' },
+        { key: 'charges_fixes',  label: 'Charges fixes (€)',     placeholder: '1200', type: 'number' },
+        { key: 'budget_courses', label: 'Budget courses (€)',    placeholder: '400',  type: 'number' },
+        { key: 'budget_loisirs', label: 'Budget loisirs (€)',    placeholder: '200',  type: 'number' },
+      ]
+    },
+    'organisation-rdvs': {
+      label: 'Mes RDVs', groupLabel: 'Organisation',
+      color: '#BA7517', bgLight: '#FAEEDA',
+      icon: 'M3 4h18v18H3zM16 2v4M8 2v4M3 10h18',
+      fields: [
+        { key: 'prochain_rdv', label: 'Prochain RDV', placeholder: 'Medecin, banque...' },
+        { key: 'date',         label: 'Date',         type: 'date' },
+        { key: 'heure',        label: 'Heure',        type: 'time' },
+        { key: 'lieu',         label: 'Lieu',         placeholder: 'Adresse...' },
+        { key: 'notes',        label: 'Notes',        placeholder: 'Preparation...' },
+      ]
+    },
+    'organisation-notes': {
+      label: 'Mes notes', groupLabel: 'Organisation',
+      color: '#BA7517', bgLight: '#FAEEDA',
+      icon: 'M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z',
+      fields: [
+        { key: 'titre',   label: 'Titre',   placeholder: 'Ma note...' },
+        { key: 'contenu', label: 'Contenu', placeholder: 'Ecris ici...' },
+        { key: 'tags',    label: 'Tags',    placeholder: 'pro, perso...' },
+      ]
+    },
+    'organisation-rappels': {
+      label: 'A ne pas oublier', groupLabel: 'Organisation',
+      color: '#BA7517', bgLight: '#FAEEDA',
+      icon: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
+      fields: [
+        { key: 'tache',       label: 'Tache',       placeholder: 'Ce que je ne dois pas oublier...' },
+        { key: 'priorite',    label: 'Priorite',    placeholder: 'Haute, Moyenne, Basse' },
+        { key: 'date_limite', label: 'Date limite', type: 'date' },
+        { key: 'notes',       label: 'Notes',       placeholder: 'Details...' },
+      ]
+    },
+    'loisirs-jeux': {
+      label: 'Mes jeux', groupLabel: 'Mes loisirs',
+      color: '#7F77DD', bgLight: '#EEEDFE',
+      icon: 'M2 6h20v12H2zM12 12h.01M7 12h.01M17 12h.01',
+      fields: [
+        { key: 'titre',      label: 'Titre du jeu', placeholder: 'Nom du jeu...' },
+        { key: 'plateforme', label: 'Plateforme',   placeholder: 'PS5, PC, Switch...' },
+        { key: 'statut',     label: 'Statut',       placeholder: 'En cours, Termine, A faire' },
+        { key: 'note',       label: 'Ma note /10',  placeholder: '8', type: 'number' },
+      ]
+    },
+    'loisirs-licences': {
+      label: 'Licences / Abonnements', groupLabel: 'Mes loisirs',
+      color: '#7F77DD', bgLight: '#EEEDFE',
+      icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',
+      fields: [
+        { key: 'service',       label: 'Service',          placeholder: 'Netflix, Spotify...' },
+        { key: 'prix_mensuel',  label: 'Prix mensuel (€)', placeholder: '10', type: 'number' },
+        { key: 'compte',        label: 'Compte email',     placeholder: 'email@...' },
+        { key: 'renouvellement',label: 'Renouvellement',   type: 'date' },
+        { key: 'login',         label: 'Identifiant',      sensitive: true, placeholder: 'email' },
+        { key: 'password',      label: 'Mot de passe',     sensitive: true, type: 'password', placeholder: '••••••••' },
+      ]
+    },
+    'loisirs-souvenirs': {
+      label: 'Mes souvenirs', groupLabel: 'Mes loisirs',
+      color: '#7F77DD', bgLight: '#EEEDFE',
+      icon: 'M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM21 15l-5-5L5 21',
+      fields: [
+        { key: 'titre',     label: 'Titre du souvenir', placeholder: 'Vacances, evenement...' },
+        { key: 'lieu',      label: 'Lieu',              placeholder: 'Ou etais-tu ?' },
+        { key: 'date',      label: 'Date',              type: 'date' },
+        { key: 'personnes', label: 'Avec qui',          placeholder: 'Noms...' },
+        { key: 'emotion',   label: 'Note emotionnelle', placeholder: 'Ce que tu as ressenti...' },
+      ]
+    },
+  }
+
+  return configs[`${groupeId}-${moduleId}`] || {
+    label: moduleId, groupLabel: groupeId,
+    color: '#534AB7', bgLight: '#EEEDFE',
+    icon: 'M12 2v20M2 12h20', fields: []
+  }
+}
+
+const s = {
+  container: { minHeight: '100vh', paddingBottom: '70px',
+    background: '#f7f5f0', fontFamily: 'system-ui, sans-serif' },
+  topbar: { background: 'white', padding: '12px 14px',
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    borderBottom: '1px solid rgba(0,0,0,0.06)',
+    position: 'sticky', top: 0, zIndex: 10 },
+  back: { background: 'none', border: 'none', fontSize: '18px',
+    cursor: 'pointer', color: '#534AB7', padding: '4px 8px' },
+  titleWrap: { flex: 1, textAlign: 'center' },
+  groupTag: { fontSize: '9px', fontWeight: '700', textTransform: 'uppercase',
+    letterSpacing: '0.8px', padding: '2px 8px', borderRadius: '6px',
+    display: 'inline-block', marginBottom: '2px' },
+  title: { fontSize: '15px', fontWeight: '700', color: '#1a1510' },
+  editBtn: { background: 'none', border: 'none', fontSize: '16px',
+    cursor: 'pointer', padding: '4px 8px' },
+  accessCard: { margin: '12px 14px', background: 'white', borderRadius: '14px',
+    padding: '12px 14px', display: 'flex', alignItems: 'center',
+    justifyContent: 'space-between', border: '1.5px solid',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+  accessLeft: { display: 'flex', alignItems: 'center', gap: '10px' },
+  accessIcon: { width: '36px', height: '36px', borderRadius: '10px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  accessTitle: { fontSize: '12px', fontWeight: '600', color: '#1a1510' },
+  accessUrl: { fontSize: '10px', color: '#bbb', marginTop: '1px' },
+  accessBtn: { padding: '7px 14px', borderRadius: '10px', border: 'none',
+    color: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
+  viewWrap: { padding: '12px 14px' },
+  empty: { textAlign: 'center', padding: '40px 24px' },
+  emptyTitle: { fontSize: '16px', fontWeight: '600',
+    color: '#1a1510', marginBottom: '6px' },
+  emptySub: { fontSize: '12px', color: '#bbb', lineHeight: '1.5' },
+  fields: { background: 'white', borderRadius: '14px',
+    overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' },
+  fieldRow: { padding: '11px 14px', display: 'flex',
+    justifyContent: 'space-between', alignItems: 'center' },
+  fieldLabel: { fontSize: '11px', color: '#888', fontWeight: '500' },
+  fieldValue: { fontSize: '12px', color: '#1a1510', fontWeight: '500',
+    textAlign: 'right', maxWidth: '180px' },
+  credentialsWrap: { background: '#f7f5f0', padding: '8px 14px',
+    borderTop: '1px solid rgba(0,0,0,0.05)' },
+  credTitle: { fontSize: '10px', color: '#bbb', fontWeight: '600',
+    textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' },
+  formWrap: { padding: '14px' },
+  formField: { marginBottom: '12px' },
+  formLabel: { fontSize: '11px', fontWeight: '600', color: '#888',
+    textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' },
+  input: { width: '100%', padding: '10px 13px', borderRadius: '11px',
+    border: '1px solid rgba(0,0,0,0.1)', fontSize: '13px',
+    background: 'white', outline: 'none',
+    fontFamily: 'system-ui, sans-serif', boxSizing: 'border-box' },
+  presetRow: { display: 'flex', gap: '7px', flexWrap: 'wrap' },
+  presetBtn: { padding: '6px 12px', borderRadius: '10px',
+    fontSize: '12px', fontWeight: '500', cursor: 'pointer' },
+  saveBtn: { width: '100%', padding: '12px', borderRadius: '12px',
+    border: 'none', color: 'white', fontSize: '14px',
+    fontWeight: '600', cursor: 'pointer', marginTop: '4px' },
+}
