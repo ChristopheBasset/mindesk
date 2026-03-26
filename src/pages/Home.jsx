@@ -1,25 +1,11 @@
-import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BottomNav from '../components/BottomNav'
 
 export default function Home({ session, onLock }) {
   const navigate = useNavigate()
-  const [captures, setCaptures] = useState([])
   const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
   const bioActive = localStorage.getItem('mindesk_biometric_active') === 'true'
-
-  useEffect(() => { loadCaptures() }, [])
-
-  const loadCaptures = async () => {
-    const { data } = await supabase
-      .from('captures')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .order('created_at', { ascending: false })
-      .limit(3)
-    if (data) setCaptures(data)
-  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -29,14 +15,32 @@ export default function Home({ session, onLock }) {
     <div style={s.container}>
 
       <div style={s.topbar}>
-        <div style={s.logo}>
-          <span style={s.logoMind}>Mind</span>
-          <span style={s.logoEsk}>esk</span>
+        <div style={s.topLeft}>
+          <div style={s.avatar}>
+            {session.user.email[0].toUpperCase()}
+          </div>
+          <div style={s.logo}>
+            <span style={s.logoMind}>Mind</span>
+            <span style={s.logoEsk}>esk</span>
+          </div>
         </div>
-        <div style={s.dateChip}>
-          {new Date().toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })}
+        <div style={s.topRight}>
+          <button
+            onClick={() => navigate('/settings')}
+            style={s.iconBtn}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+            </svg>
+          </button>
+          <button style={s.micBtn}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+              <rect x="9" y="2" width="6" height="11" rx="3"/>
+              <path d="M5 10a7 7 0 0 0 14 0"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+          </button>
         </div>
-        <button style={s.micBtn}>🎤</button>
       </div>
 
       <div style={s.aiBar}>
@@ -46,133 +50,58 @@ export default function Home({ session, onLock }) {
         </span>
       </div>
 
-      <div style={s.sec}>Capture rapide</div>
-      <div style={s.captureRow}>
-        <button
-          onClick={() => navigate('/capture?mode=photo')}
-          style={{...s.capBtn, borderTop: '3px solid #D85A30'}}>
-          <span style={s.capIcon}>📸</span>
-          <div>
-            <div style={s.capLabel}>Photo souvenir</div>
-            <div style={s.capSub}>Resto, objet, lieu...</div>
-          </div>
-        </button>
-        <button
-          onClick={() => navigate('/capture?mode=idea')}
-          style={{...s.capBtn, borderTop: '3px solid #378ADD'}}>
-          <span style={s.capIcon}>💡</span>
-          <div>
-            <div style={s.capLabel}>Idee flash</div>
-            <div style={s.capSub}>Avant de l oublier</div>
-          </div>
-        </button>
-      </div>
+      <div style={s.scroll}>
 
-      <div style={s.sec}>Mes services</div>
-      <div style={s.svcGrid}>
-        {services.map(sv => (
-          <div key={sv.label} style={s.svcItem}>
-            <div style={{...s.svcIcon, background: sv.bg}}>{sv.icon}</div>
-            <div style={s.svcLabel}>{sv.label}</div>
-          </div>
-        ))}
-        <div style={s.svcItem}>
-          <div style={{...s.svcIcon, background: '#f5f5f5', border: '1.5px dashed #ddd'}}>
-            <span style={{color: '#ccc', fontSize: '16px'}}>+</span>
-          </div>
-          <div style={{...s.svcLabel, color: '#ccc'}}>Ajouter</div>
-        </div>
-      </div>
-
-      {/* MODULES — chaque carte navigue vers son path si défini */}
-      <div style={s.sec}>Modules</div>
-      <div style={s.grid}>
-        {modules.map(m => (
-          <div key={m.title}
-            style={{...s.mcard, cursor: m.path ? 'pointer' : 'default'}}
-            onClick={() => m.path && navigate(m.path)}>
-            <div style={{...s.mstripe, background: m.color}} />
-            <span style={s.micon}>{m.icon}</span>
-            <div style={s.mtitle}>{m.title}</div>
-            <div style={s.msub}>{m.sub}</div>
-            {m.badge && (
-              <div style={{...s.mbadge, background: m.badgeBg, color: m.color}}>
-                {m.badge}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {captures.length > 0 && (
-        <>
-          <div style={s.sec}>Dernieres captures</div>
-          <div style={s.recentList}>
-            {captures.map(c => (
-              <div key={c.id} style={s.recItem}>
-                <div style={{
-                  ...s.recThumb,
-                  background: c.type === 'photo' ? '#FAECE7' : '#E6F1FB'
-                }}>
-                  {c.type === 'photo' && c.image_url
-                    ? <img src={c.image_url} style={s.recImg} alt="" />
-                    : <span style={{fontSize: '16px'}}>{c.type === 'photo' ? '📸' : '💡'}</span>
-                  }
-                </div>
-                <div style={s.recBody}>
-                  <div style={s.recTitle}>{c.content || 'Sans note'}</div>
-                  <div style={s.recMeta}>
-                    {c.tag} · {new Date(c.created_at).toLocaleDateString('fr-FR')}
+        {groupes.map(groupe => (
+          <div key={groupe.id} style={s.group}>
+            <div style={s.groupHeader}>
+              <div style={{...s.groupBar, background: groupe.color}} />
+              <div style={{...s.groupTitle, color: groupe.color}}>{groupe.label}</div>
+              <div style={s.groupCount}>{groupe.modules.length} modules</div>
+            </div>
+            <div style={s.groupGrid}>
+              {groupe.modules.map(mod => (
+                <div
+                  key={mod.id}
+                  style={s.card}
+                  onClick={() => navigate(`/module/${groupe.id}/${mod.id}`)}>
+                  <div style={{...s.cardStripe, background: groupe.color}} />
+                  <div style={{...s.iconWrap, background: groupe.bgLight}}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke={groupe.color} strokeWidth="2" strokeLinecap="round">
+                      <path d={mod.icon}/>
+                    </svg>
                   </div>
+                  <div style={s.cardLabel}>{mod.label}</div>
+                  <div style={s.cardSub}>{mod.sub}</div>
                 </div>
-                <div style={{
-                  ...s.recTag,
-                  background: c.type === 'photo' ? '#FAECE7' : '#E6F1FB',
-                  color: c.type === 'photo' ? '#993C1D' : '#185FA5'
-                }}>
-                  {c.type === 'photo' ? '📸' : '💡'}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </>
-      )}
+        ))}
 
-      {/* BOUTONS DU BAS — un seul bloc propre */}
-      {!pinActive && (
-        <div style={s.logoutWrap}>
-          <button
-            onClick={() => navigate('/setup-pin')}
-            style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
-            🔐 Activer le code PIN
+        {/* ACTIONS */}
+        <div style={s.actionsWrap}>
+          {!pinActive && (
+            <button onClick={() => navigate('/setup-pin')} style={{...s.actionBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+              🔐 Activer le code PIN
+            </button>
+          )}
+          {pinActive && (
+            <button onClick={() => onLock()} style={{...s.actionBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+              🔒 Verrouiller
+            </button>
+          )}
+          {!bioActive && (
+            <button onClick={() => navigate('/setup-biometric')} style={{...s.actionBtn, color: '#1D9E75', borderColor: 'rgba(29,158,117,0.2)'}}>
+              👆 Activer l empreinte
+            </button>
+          )}
+          <button onClick={handleLogout} style={s.actionBtn}>
+            Deconnexion complete
           </button>
         </div>
-      )}
 
-      {pinActive && (
-        <div style={s.logoutWrap}>
-          <button
-            onClick={() => onLock()}
-            style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
-            🔒 Verrouiller
-          </button>
-        </div>
-      )}
-
-      {!bioActive && (
-        <div style={s.logoutWrap}>
-          <button
-            onClick={() => navigate('/setup-biometric')}
-            style={{...s.logoutBtn, color: '#1D9E75', borderColor: 'rgba(29,158,117,0.2)'}}>
-            👆 Activer l empreinte digitale
-          </button>
-        </div>
-      )}
-
-      <div style={s.logoutWrap}>
-        <button onClick={handleLogout} style={s.logoutBtn}>
-          Deconnexion complete
-        </button>
       </div>
 
       <BottomNav />
@@ -180,90 +109,124 @@ export default function Home({ session, onLock }) {
   )
 }
 
-const services = [
-  { icon: '⚡', label: 'EDF',    bg: '#E6F1FB' },
-  { icon: '📱', label: 'SFR',    bg: '#FCEBEB' },
-  { icon: '🏦', label: 'Banque', bg: '#EEEDFE' },
-  { icon: '📰', label: 'Medias', bg: '#FAEEDA' },
-]
-
-// path: null = pas encore développé, path: '/xxx' = cliquable
-const modules = [
-  { icon: '📋', title: 'Taches',       sub: '0 en attente',  color: '#534AB7', badgeBg: '#EEEDFE', path: null },
-  { icon: '📸', title: 'Souvenirs',    sub: '0 captures',    color: '#D85A30', badgeBg: '#FAECE7', path: '/galerie' },
-  { icon: '📅', title: 'Agenda',       sub: 'Aucun RDV',     color: '#1D9E75', badgeBg: '#E1F5EE', path: null },
-  { icon: '💡', title: 'Idees',        sub: '0 idees',       color: '#7F77DD', badgeBg: '#EEEDFE', path: '/galerie' },
-  { icon: '💳', title: 'Portefeuille', sub: '0 cartes',      color: '#BA7517', badgeBg: '#FAEEDA', path: '/portefeuille' },
-  { icon: '🔔', title: 'Alertes',      sub: 'Aucune alerte', color: '#E24B4A', badgeBg: '#FCEBEB', path: null },
+const groupes = [
+  {
+    id: 'charges',
+    label: 'Mes charges',
+    color: '#534AB7',
+    bgLight: '#EEEDFE',
+    modules: [
+      { id: 'energie',   label: 'Electricite', sub: 'Gaz',          icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z' },
+      { id: 'operateur', label: 'Operateur',   sub: 'Tel / Internet', icon: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 4a2 2 0 0 1 2-2h4' },
+      { id: 'impots',    label: 'Impots',      sub: 'Taxes',          icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10' },
+    ]
+  },
+  {
+    id: 'assurances',
+    label: 'Assurances',
+    color: '#D85A30',
+    bgLight: '#FAECE7',
+    modules: [
+      { id: 'secu',     label: 'Secu',    sub: 'Sociale',    icon: 'M22 12h-4l-3 9L9 3l-3 9H2' },
+      { id: 'mutuelle', label: 'Mutuelle',sub: 'Sante',      icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' },
+      { id: 'biens',    label: 'Maison',  sub: 'Vehicule',   icon: 'M1 3h15v13H1zM16 8h4l3 5v3h-7V8zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z' },
+    ]
+  },
+  {
+    id: 'documents',
+    label: 'Documents',
+    color: '#5F5E5A',
+    bgLight: '#F1EFE8',
+    modules: [
+      { id: 'identite',    label: 'Identite',    sub: 'CNI, passeport', icon: 'M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM8 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm8-4h4m-4 4h2' },
+      { id: 'fidelite',    label: 'Cartes',      sub: 'Fidelite',       icon: 'M2 5h20v14H2zM2 10h20' },
+      { id: 'justifs',     label: 'Justificatifs',sub: 'Factures',      icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6' },
+    ]
+  },
+  {
+    id: 'portefeuille',
+    label: 'Portefeuille',
+    color: '#1D9E75',
+    bgLight: '#E1F5EE',
+    modules: [
+      { id: 'cb',          label: 'CB',          sub: 'Cartes bancaires', icon: 'M2 5h20v14H2zM2 10h20' },
+      { id: 'placements',  label: 'Placements',  sub: 'Epargne',          icon: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' },
+      { id: 'budget',      label: 'Budget',      sub: 'Depenses',         icon: 'M3 3h18v18H3zM3 9h18M9 21V9' },
+    ]
+  },
+  {
+    id: 'organisation',
+    label: 'Organisation',
+    color: '#BA7517',
+    bgLight: '#FAEEDA',
+    modules: [
+      { id: 'rdvs',   label: 'Mes RDVs',  sub: 'Agenda',       icon: 'M3 4h18v18H3zM16 2v4M8 2v4M3 10h18' },
+      { id: 'notes',  label: 'Mes notes', sub: 'Memo',         icon: 'M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z' },
+      { id: 'rappels',label: 'A ne pas',  sub: 'oublier',      icon: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0' },
+    ]
+  },
+  {
+    id: 'loisirs',
+    label: 'Mes loisirs',
+    color: '#7F77DD',
+    bgLight: '#EEEDFE',
+    modules: [
+      { id: 'jeux',      label: 'Mes jeux',   sub: 'Gaming',       icon: 'M2 6h20v12H2zM12 12h.01M7 12h.01M17 12h.01' },
+      { id: 'licences',  label: 'Licences',   sub: 'Abonnements',  icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4' },
+      { id: 'souvenirs', label: 'Souvenirs',  sub: 'Photos',       icon: 'M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM21 15l-5-5L5 21' },
+    ]
+  },
 ]
 
 const s = {
   container: { minHeight: '100vh', paddingBottom: '70px',
     background: '#f7f5f0', fontFamily: 'system-ui, sans-serif' },
-  topbar: { padding: '12px 16px', display: 'flex', alignItems: 'center',
+  topbar: { padding: '10px 14px', display: 'flex', alignItems: 'center',
     justifyContent: 'space-between', background: '#f7f5f0' },
-  logo: { fontSize: '20px', fontWeight: '700' },
+  topLeft: { display: 'flex', alignItems: 'center', gap: '8px' },
+  avatar: { width: '30px', height: '30px', borderRadius: '50%',
+    background: 'linear-gradient(135deg, #534AB7, #1D9E75)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '12px', color: 'white', fontWeight: '700' },
+  logo: { fontSize: '18px', fontWeight: '700', letterSpacing: '-0.5px' },
   logoMind: { color: '#534AB7' },
   logoEsk: { color: '#1D9E75' },
-  dateChip: { background: 'white', border: '1px solid rgba(0,0,0,0.07)',
-    borderRadius: '20px', padding: '4px 10px', fontSize: '10px', color: '#888' },
-  micBtn: { width: '30px', height: '30px', background: '#534AB7', border: 'none',
-    borderRadius: '50%', cursor: 'pointer', fontSize: '14px' },
-  aiBar: { margin: '4px 14px 10px', background: 'white',
+  topRight: { display: 'flex', gap: '8px', alignItems: 'center' },
+  iconBtn: { width: '30px', height: '30px', borderRadius: '50%',
+    background: 'white', border: '1px solid rgba(0,0,0,0.07)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' },
+  micBtn: { width: '30px', height: '30px', background: '#534AB7',
+    border: 'none', borderRadius: '50%',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' },
+  aiBar: { margin: '4px 14px 12px', background: 'white',
     border: '1.5px solid rgba(83,74,183,0.18)', borderRadius: '12px',
     padding: '9px 12px', display: 'flex', alignItems: 'center', gap: '8px' },
   aiDot: { width: '7px', height: '7px', borderRadius: '50%',
     background: '#534AB7', flexShrink: 0 },
   aiHint: { fontSize: '11px', color: '#bbb' },
   aiStrong: { color: '#444', fontWeight: '500' },
-  sec: { fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1.2px',
-    color: '#bbb', fontWeight: '600', padding: '0 14px',
-    marginBottom: '7px', marginTop: '4px' },
-  captureRow: { display: 'flex', gap: '7px', padding: '0 14px', marginBottom: '12px' },
-  capBtn: { flex: 1, background: 'white', border: '1px solid rgba(0,0,0,0.06)',
-    borderRadius: '14px', padding: '12px 10px',
-    display: 'flex', alignItems: 'center', gap: '8px',
-    cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' },
-  capIcon: { fontSize: '20px' },
-  capLabel: { fontSize: '11px', fontWeight: '600', color: '#1a1510', textAlign: 'left' },
-  capSub: { fontSize: '9px', color: '#bbb', textAlign: 'left', marginTop: '1px' },
-  svcGrid: { display: 'grid', gridTemplateColumns: 'repeat(5,1fr)',
-    gap: '4px', padding: '0 12px', marginBottom: '12px' },
-  svcItem: { display: 'flex', flexDirection: 'column',
-    alignItems: 'center', gap: '4px', padding: '6px 2px', borderRadius: '10px' },
-  svcIcon: { width: '40px', height: '40px', borderRadius: '12px',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: '18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' },
-  svcLabel: { fontSize: '9px', color: '#888', textAlign: 'center' },
-  grid: { display: 'grid', gridTemplateColumns: '1fr 1fr',
-    gap: '7px', padding: '0 14px', marginBottom: '12px' },
-  mcard: { background: 'white', borderRadius: '14px', padding: '12px',
-    position: 'relative', overflow: 'hidden',
+  scroll: { overflowY: 'auto' },
+  group: { padding: '0 14px', marginBottom: '16px' },
+  groupHeader: { display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '8px' },
+  groupBar: { width: '3px', height: '14px', borderRadius: '2px', flexShrink: 0 },
+  groupTitle: { fontSize: '11px', fontWeight: '700' },
+  groupCount: { fontSize: '9px', color: '#bbb', marginLeft: 'auto' },
+  groupGrid: { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '7px' },
+  card: { background: 'white', borderRadius: '12px', padding: '10px 6px 12px',
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
+    justifyContent: 'center', textAlign: 'center',
+    cursor: 'pointer', position: 'relative', overflow: 'hidden',
     boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
-    border: '1px solid rgba(0,0,0,0.04)' },
-  mstripe: { position: 'absolute', top: 0, left: 0,
-    width: '100%', height: '3px', borderRadius: '14px 14px 0 0' },
-  micon: { fontSize: '18px', marginBottom: '6px', display: 'block' },
-  mtitle: { fontSize: '11px', fontWeight: '600', color: '#1a1510', marginBottom: '2px' },
-  msub: { fontSize: '9.5px', color: '#bbb' },
-  mbadge: { position: 'absolute', top: '9px', right: '9px',
-    fontSize: '9px', fontWeight: '600', padding: '1px 5px', borderRadius: '7px' },
-  recentList: { padding: '0 14px', marginBottom: '14px',
-    display: 'flex', flexDirection: 'column', gap: '6px' },
-  recItem: { background: 'white', borderRadius: '11px', padding: '9px 10px',
-    display: 'flex', alignItems: 'center', gap: '9px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-    border: '1px solid rgba(0,0,0,0.04)' },
-  recThumb: { width: '36px', height: '36px', borderRadius: '8px',
-    flexShrink: 0, display: 'flex', alignItems: 'center',
-    justifyContent: 'center', overflow: 'hidden' },
-  recImg: { width: '100%', height: '100%', objectFit: 'cover' },
-  recBody: { flex: 1 },
-  recTitle: { fontSize: '10.5px', fontWeight: '500', color: '#222', lineHeight: '1.3' },
-  recMeta: { fontSize: '9px', color: '#bbb', marginTop: '1px' },
-  recTag: { fontSize: '12px', padding: '4px 6px', borderRadius: '7px' },
-  logoutWrap: { padding: '0 14px', marginBottom: '8px' },
-  logoutBtn: { width: '100%', padding: '10px', borderRadius: '10px',
+    border: '1px solid rgba(0,0,0,0.04)', minHeight: '82px' },
+  cardStripe: { position: 'absolute', top: 0, left: 0, width: '100%', height: '2.5px' },
+  iconWrap: { width: '32px', height: '32px', borderRadius: '9px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    marginBottom: '7px', flexShrink: 0 },
+  cardLabel: { fontSize: '10px', fontWeight: '600', color: '#1a1510', lineHeight: '1.2' },
+  cardSub: { fontSize: '8.5px', color: '#bbb', marginTop: '2px' },
+  actionsWrap: { padding: '0 14px', marginBottom: '16px',
+    display: 'flex', flexDirection: 'column', gap: '8px' },
+  actionBtn: { width: '100%', padding: '10px', borderRadius: '10px',
     border: '1px solid rgba(0,0,0,0.08)', background: 'transparent',
     color: '#bbb', fontSize: '12px', cursor: 'pointer' },
 }
