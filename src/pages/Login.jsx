@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function Login() {
-  const [mode, setMode] = useState('choice') // 'choice' | 'email' | 'pin'
+  const [mode, setMode] = useState('choice')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [pin, setPin] = useState('')
@@ -14,37 +14,38 @@ export default function Login() {
   const savedEmail = localStorage.getItem('mindesk_email')
 
   const handleEmailLogin = async (e) => {
-  e.preventDefault()
-  setLoading(true)
-  setError(null)
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (!error) {
-    localStorage.setItem('mindesk_email', email)
-    localStorage.setItem('mindesk_pwd', password)
-  } else {
-    setError('Email ou mot de passe incorrect')
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (!error) {
+      localStorage.setItem('mindesk_email', email)
+      localStorage.setItem('mindesk_pwd', password)
+    } else {
+      setError('Email ou mot de passe incorrect')
+    }
+    setLoading(false)
   }
-  setLoading(false)
-}
 
   const handlePinDigit = async (d) => {
     const newPin = pin + d
     setPin(newPin)
-    if (newPin === pinCode) {
-  const savedPwd = localStorage.getItem('mindesk_pwd')
-  const { error } = await supabase.auth.signInWithPassword({
-    email: savedEmail,
-    password: savedPwd
-  })
-  if (error) {
-    setError('Session expiree, utilise email + mot de passe')
-    setTimeout(() => { setMode('email') }, 2000)
-  }
-} else {
-  setError('Code incorrect')
-  setPin('')
-  setTimeout(() => setError(''), 2000)
-}
+    if (newPin.length === 4) {
+      if (newPin === pinCode) {
+        const savedPwd = localStorage.getItem('mindesk_pwd')
+        const { error } = await supabase.auth.signInWithPassword({
+          email: savedEmail,
+          password: savedPwd
+        })
+        if (error) {
+          setError('Session expiree, utilise email + mot de passe')
+          setTimeout(() => { setMode('email') }, 2000)
+        }
+      } else {
+        setError('Code incorrect')
+        setPin('')
+        setTimeout(() => setError(''), 2000)
+      }
     }
   }
 
@@ -63,7 +64,6 @@ export default function Login() {
         </div>
 
         <div style={s.choiceList}>
-
           {pinActive && pinCode && savedEmail && (
             <button onClick={() => setMode('pin')} style={s.choiceBtn}>
               <div style={{...s.choiceIcon, background: '#EEEDFE'}}>🔐</div>
@@ -87,12 +87,11 @@ export default function Login() {
           <button onClick={() => setMode('email')} style={s.choiceBtn}>
             <div style={{...s.choiceIcon, background: '#E6F1FB'}}>📧</div>
             <div style={s.choiceBody}>
-              <div style={s.choiceTitle}>Email & mot de passe</div>
+              <div style={s.choiceTitle}>Email et mot de passe</div>
               <div style={s.choiceSub}>Connexion classique</div>
             </div>
             <div style={s.choiceArrow}>›</div>
           </button>
-
         </div>
 
         <p style={s.link}>
@@ -112,7 +111,7 @@ export default function Login() {
             <span style={s.logoMind}>Mind</span>
             <span style={s.logoEsk}>esk</span>
           </div>
-          <div style={{fontSize: '14px', color: '#888', marginTop: '8px'}}>{savedEmail}</div>
+          <div style={{fontSize: '13px', color: '#bbb', marginTop: '8px'}}>{savedEmail}</div>
         </div>
 
         <div style={s.pinTitle}>Entre ton code PIN</div>
@@ -146,7 +145,7 @@ export default function Login() {
     )
   }
 
-  // PAGE BIOMETRIE (placeholder)
+  // PAGE BIOMETRIE
   if (mode === 'bio') {
     return (
       <div style={s.container}>
@@ -159,11 +158,12 @@ export default function Login() {
         </div>
         <div style={{textAlign: 'center', padding: '40px 24px'}}>
           <div style={{fontSize: '64px', marginBottom: '16px'}}>👆</div>
-          <div style={{fontSize: '18px', fontWeight: '600', color: '#1a1510', marginBottom: '8px'}}>
+          <div style={{fontSize: '18px', fontWeight: '600',
+            color: '#1a1510', marginBottom: '8px'}}>
             Empreinte digitale
           </div>
           <div style={{fontSize: '13px', color: '#bbb', marginBottom: '32px'}}>
-            Pose ton doigt sur le capteur
+            Bientot disponible
           </div>
           <button onClick={() => setMode('choice')} style={s.altBtn}>
             Utiliser une autre methode
@@ -184,9 +184,11 @@ export default function Login() {
         </div>
       </div>
       <form onSubmit={handleEmailLogin} style={s.form}>
-        <input style={s.input} type="email" placeholder="Email"
+        <input
+          style={s.input} type="email" placeholder="Email"
           value={email} onChange={e => setEmail(e.target.value)} required />
-        <input style={s.input} type="password" placeholder="Mot de passe"
+        <input
+          style={s.input} type="password" placeholder="Mot de passe"
           value={password} onChange={e => setPassword(e.target.value)} required />
         {error && <p style={s.error}>{error}</p>}
         <button style={s.btn} type="submit" disabled={loading}>
@@ -212,19 +214,21 @@ const s = {
   sub: { fontSize: '13px', color: '#bbb' },
   choiceList: { width: '100%', maxWidth: '320px',
     display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' },
-  choiceBtn: { width: '100%', background: 'white', border: '1px solid rgba(0,0,0,0.06)',
-    borderRadius: '16px', padding: '14px', display: 'flex',
-    alignItems: 'center', gap: '12px', cursor: 'pointer',
+  choiceBtn: { width: '100%', background: 'white',
+    border: '1px solid rgba(0,0,0,0.06)', borderRadius: '16px',
+    padding: '14px', display: 'flex', alignItems: 'center',
+    gap: '12px', cursor: 'pointer',
     boxShadow: '0 1px 4px rgba(0,0,0,0.05)', textAlign: 'left' },
   choiceIcon: { width: '42px', height: '42px', borderRadius: '12px',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontSize: '20px', flexShrink: 0 },
   choiceBody: { flex: 1 },
-  choiceTitle: { fontSize: '14px', fontWeight: '600', color: '#1a1510', marginBottom: '2px' },
+  choiceTitle: { fontSize: '14px', fontWeight: '600',
+    color: '#1a1510', marginBottom: '2px' },
   choiceSub: { fontSize: '11px', color: '#bbb' },
   choiceArrow: { fontSize: '20px', color: '#bbb' },
-  pinTitle: { fontSize: '18px', fontWeight: '600', color: '#1a1510',
-    marginBottom: '24px', textAlign: 'center' },
+  pinTitle: { fontSize: '18px', fontWeight: '600',
+    color: '#1a1510', marginBottom: '24px', textAlign: 'center' },
   dots: { display: 'flex', gap: '16px', marginBottom: '32px' },
   dot: { width: '16px', height: '16px', borderRadius: '50%', transition: 'background 0.2s' },
   keypad: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
@@ -233,18 +237,4 @@ const s = {
     background: 'white', fontSize: '22px', fontWeight: '500',
     color: '#1a1510', cursor: 'pointer',
     boxShadow: '0 1px 4px rgba(0,0,0,0.08)' },
-  keyEmpty: { background: 'transparent', boxShadow: 'none', cursor: 'default' },
-  keyDel: { background: 'transparent', boxShadow: 'none', color: '#534AB7', fontSize: '20px' },
-  form: { display: 'flex', flexDirection: 'column', gap: '12px',
-    width: '100%', maxWidth: '320px' },
-  input: { padding: '12px 16px', borderRadius: '12px',
-    border: '1.5px solid rgba(0,0,0,0.1)',
-    fontSize: '15px', background: 'white', outline: 'none' },
-  btn: { padding: '13px', borderRadius: '12px', border: 'none',
-    background: 'linear-gradient(135deg, #534AB7, #1D9E75)',
-    color: 'white', fontSize: '15px', fontWeight: '600', cursor: 'pointer' },
-  error: { color: '#E24B4A', fontSize: '13px', textAlign: 'center', marginBottom: '8px' },
-  link: { fontSize: '13px', color: '#bbb' },
-  altBtn: { background: 'none', border: 'none', color: '#bbb',
-    fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' },
-}
+  keyEmpty: { background: 'transparent', boxS
