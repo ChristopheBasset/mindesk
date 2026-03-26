@@ -89,6 +89,14 @@ const s = {
   keyDel: { background:'transparent', boxShadow:'none', color:'#534AB7', fontSize:'20px' },
 }
 
+function ModuleRouter({ session }) {
+  const { groupeId, moduleId } = useParams()
+  const key = `${groupeId}-${moduleId}`
+  if (LIST_MODULE_KEYS.includes(key)) {
+    return <ModuleList session={session} />
+  }
+  return <ModuleDetail session={session} />
+}
 export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -139,7 +147,7 @@ export default function App() {
     )
   }
 
-  return (
+ return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={
@@ -149,20 +157,14 @@ export default function App() {
         } />
         <Route path="/capture" element={session ? <Capture session={session} /> : <Navigate to="/" />} />
         <Route path="/galerie" element={session ? <Galerie session={session} /> : <Navigate to="/" />} />
+        <Route path="/portefeuille" element={session ? <Portefeuille session={session} /> : <Navigate to="/" />} />
         <Route path="/setup-pin" element={session ? <SetupPin /> : <Navigate to="/" />} />
         <Route path="/setup-biometric" element={session ? <SetupBiometric session={session} /> : <Navigate to="/" />} />
+        <Route path="/module/:groupeId/:moduleId" element={
+          session ? <ModuleRouter session={session} /> : <Navigate to="/" />
+        } />
         <Route path="/register" element={session ? <Navigate to="/" /> : <Register />} />
         <Route path="*" element={<Navigate to="/" />} />
-        <Route path="/portefeuille" element={session ? <Portefeuille session={session} /> : <Navigate to="/" />} />
-        <Route path="/module/:groupeId/:moduleId" element={
-  session ? (
-    LIST_MODULE_KEYS.includes(
-      window.location.pathname.split('/module/')[1]?.replace('/', '-')
-    )
-      ? <ModuleList session={session} />
-      : <ModuleDetail session={session} />
-  ) : <Navigate to="/" />
-} />
       </Routes>
     </BrowserRouter>
   )
