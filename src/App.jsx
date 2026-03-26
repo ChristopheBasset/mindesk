@@ -110,25 +110,32 @@ export default function App() {
   const pinCode = localStorage.getItem('mindesk_pin')
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setLoading(false)
-    })
-    supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session)
-      if (event === 'PASSWORD_RECOVERY') {
-        setPasswordRecovery(true)
-      }
-      if (!session) {
-        setLocked(true)
-        setUnlockedBy(null)
-      }
-      if (event === 'SIGNED_IN' && locked) {
-        setUnlockedBy('login')
-        setLocked(false)
-      }
-    })
-  }, [])
+  // Détecte si c'est un lien de recovery
+  const hash = window.location.hash
+  if (hash.includes('type=recovery')) {
+    setPasswordRecovery(true)
+  }
+
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setSession(session)
+    setLoading(false)
+  })
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    setSession(session)
+    if (event === 'PASSWORD_RECOVERY') {
+      setPasswordRecovery(true)
+    }
+    if (!session) {
+      setLocked(true)
+      setUnlockedBy(null)
+    }
+    if (event === 'SIGNED_IN' && locked) {
+      setUnlockedBy('login')
+      setLocked(false)
+    }
+  })
+}, [])
 
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center',
