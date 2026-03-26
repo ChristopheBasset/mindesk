@@ -6,6 +6,7 @@ import BottomNav from '../components/BottomNav'
 export default function Home({ session }) {
   const navigate = useNavigate()
   const [captures, setCaptures] = useState([])
+  const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
 
   useEffect(() => { loadCaptures() }, [])
 
@@ -131,6 +132,16 @@ export default function Home({ session }) {
         </>
       )}
 
+      {!pinActive && (
+        <div style={s.logoutWrap}>
+          <button
+            onClick={() => navigate('/setup-pin')}
+            style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+            🔐 Activer le code PIN
+          </button>
+        </div>
+      )}
+
       <div style={s.logoutWrap}>
         <button onClick={handleLogout} style={s.logoutBtn}>Deconnexion</button>
       </div>
@@ -221,7 +232,7 @@ const s = {
   recTitle: { fontSize: '10.5px', fontWeight: '500', color: '#222', lineHeight: '1.3' },
   recMeta: { fontSize: '9px', color: '#bbb', marginTop: '1px' },
   recTag: { fontSize: '12px', padding: '4px 6px', borderRadius: '7px' },
-  logoutWrap: { padding: '0 14px', marginBottom: '16px' },
+  logoutWrap: { padding: '0 14px', marginBottom: '8px' },
   logoutBtn: { width: '100%', padding: '10px', borderRadius: '10px',
     border: '1px solid rgba(0,0,0,0.08)', background: 'transparent',
     color: '#bbb', fontSize: '12px', cursor: 'pointer' },

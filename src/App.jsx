@@ -6,10 +6,16 @@ import Register from './pages/Register'
 import Home from './pages/Home'
 import Capture from './pages/Capture'
 import Galerie from './pages/Galerie'
+import SetupPin from './pages/SetupPin'
+import PinLogin from './pages/PinLogin'
 
 export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [pinVerified, setPinVerified] = useState(false)
+
+  const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
+  const pinCode = localStorage.getItem('mindesk_pin')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -18,15 +24,31 @@ export default function App() {
     })
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
+      if (session) setPinVerified(false)
     })
   }, [])
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', background: 'linear-gradient(160deg, #e8f0f8 0%, #f2e4dc 100%)' }}>
-      <p style={{ color: '#b0a090', fontSize: '16px' }}>Chargement...</p>
+      justifyContent: 'center', background: '#f7f5f0' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>
+          <span style={{ color: '#534AB7' }}>Mind</span>
+          <span style={{ color: '#1D9E75' }}>esk</span>
+        </div>
+        <p style={{ color: '#bbb', fontSize: '14px' }}>Chargement...</p>
+      </div>
     </div>
   )
+
+  // Si connecté mais PIN actif et pas encore vérifié
+  if (session && pinActive && pinCode && !pinVerified) {
+    return (
+      <BrowserRouter>
+        <PinLogin onSuccess={() => setPinVerified(true)} />
+      </BrowserRouter>
+    )
+  }
 
   return (
     <BrowserRouter>
@@ -34,6 +56,7 @@ export default function App() {
         <Route path="/" element={session ? <Home session={session} /> : <Login />} />
         <Route path="/capture" element={session ? <Capture session={session} /> : <Navigate to="/" />} />
         <Route path="/galerie" element={session ? <Galerie session={session} /> : <Navigate to="/" />} />
+        <Route path="/setup-pin" element={session ? <SetupPin /> : <Navigate to="/" />} />
         <Route path="/register" element={session ? <Navigate to="/" /> : <Register />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
