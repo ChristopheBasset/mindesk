@@ -4,56 +4,62 @@ import { supabase } from '../../lib/supabase'
 import BottomNav from '../../components/BottomNav'
 
 const LIENS_PREDEFINIS = {
-  'charges-energie': [
-    { label: 'EDF',             url: 'https://particulier.edf.fr/fr/accueil/espace-client/tableau-de-bord.html' },
-    { label: 'Engie',           url: 'https://particuliers.engie.fr/espace-client' },
-    { label: 'Total Energies',  url: 'https://www.totalenergies-particuliers.fr/espace-client' },
-    { label: 'Ekwateur',        url: 'https://app.ekwateur.fr' },
+  'charges-energie-elec': [
+    { label: 'EDF',            url: 'https://particulier.edf.fr/fr/accueil/espace-client/tableau-de-bord.html' },
+    { label: 'Engie',          url: 'https://particuliers.engie.fr/espace-client' },
+    { label: 'Total Energies', url: 'https://www.totalenergies-particuliers.fr/espace-client' },
+    { label: 'Ekwateur',       url: 'https://app.ekwateur.fr' },
+  ],
+  'charges-energie-gaz': [
+    { label: 'Engie Gaz',  url: 'https://particuliers.engie.fr/espace-client' },
+    { label: 'Primagaz',   url: 'https://www.primagaz.fr/espace-client' },
+    { label: 'Vitogaz',    url: 'https://www.vitogaz.fr/espace-client' },
+    { label: 'DomOil',     url: 'https://www.domoil.fr' },
   ],
   'charges-operateur': [
-    { label: 'SFR',             url: 'https://www.sfr.fr/mon-espace-sfr' },
-    { label: 'Orange',          url: 'https://espaceclient.orange.fr' },
-    { label: 'Free Mobile',     url: 'https://mobile.free.fr/account' },
-    { label: 'Bouygues',        url: 'https://www.bouyguestelecom.fr/mon-compte' },
-    { label: 'Free Fibre',      url: 'https://adsl.free.fr/login.pl' },
+    { label: 'SFR',        url: 'https://www.sfr.fr/mon-espace-sfr' },
+    { label: 'Orange',     url: 'https://espaceclient.orange.fr' },
+    { label: 'Free Mobile',url: 'https://mobile.free.fr/account' },
+    { label: 'Bouygues',   url: 'https://www.bouyguestelecom.fr/mon-compte' },
+    { label: 'Free Fibre', url: 'https://adsl.free.fr/login.pl' },
   ],
   'charges-impots': [
-    { label: 'Impots.gouv',     url: 'https://cfspart.impots.gouv.fr' },
+    { label: 'Impots.gouv', url: 'https://cfspart.impots.gouv.fr' },
   ],
   'assurances-secu': [
-    { label: 'Ameli',           url: 'https://assure.ameli.fr' },
+    { label: 'Ameli', url: 'https://assure.ameli.fr' },
   ],
   'assurances-mutuelle': [
-    { label: 'Harmonie',        url: 'https://www.harmonie-mutuelle.fr/espace-client' },
-    { label: 'MGEN',            url: 'https://www.mgen.fr/mon-espace-perso' },
-    { label: 'Malakoff',        url: 'https://www.malakoffhumanis.com/espace-client' },
-    { label: 'Alan',            url: 'https://alan.com/fr-fr' },
-    { label: 'April',           url: 'https://www.april.fr/espace-client' },
+    { label: 'Harmonie', url: 'https://www.harmonie-mutuelle.fr/espace-client' },
+    { label: 'MGEN',     url: 'https://www.mgen.fr/mon-espace-perso' },
+    { label: 'Malakoff', url: 'https://www.malakoffhumanis.com/espace-client' },
+    { label: 'Alan',     url: 'https://alan.com/fr-fr' },
+    { label: 'April',    url: 'https://www.april.fr/espace-client' },
   ],
   'assurances-biens': [
-    { label: 'AXA',             url: 'https://www.axa.fr/mon-espace-client' },
-    { label: 'MAIF',            url: 'https://www.maif.fr/espace-client' },
-    { label: 'MACIF',           url: 'https://www.macif.fr/assurance/particuliers/espace-client' },
-    { label: 'Groupama',        url: 'https://www.groupama.fr/espace-client' },
-    { label: 'Allianz',         url: 'https://www.allianz.fr/espace-client' },
+    { label: 'AXA',      url: 'https://www.axa.fr/mon-espace-client' },
+    { label: 'MAIF',     url: 'https://www.maif.fr/espace-client' },
+    { label: 'MACIF',    url: 'https://www.macif.fr/assurance/particuliers/espace-client' },
+    { label: 'Groupama', url: 'https://www.groupama.fr/espace-client' },
+    { label: 'Allianz',  url: 'https://www.allianz.fr/espace-client' },
   ],
   'portefeuille-cb': [
-    { label: 'BNP Paribas',     url: 'https://mabanque.bnpparibas.com' },
-    { label: 'Credit Agricole', url: 'https://www.credit-agricole.fr/ca-languedoc/particulier.html' },
-    { label: 'Societe Generale',url: 'https://particuliers.societegenerale.fr' },
-    { label: 'LCL',             url: 'https://monespace.lcl.fr' },
-    { label: 'Boursorama',      url: 'https://www.boursorama.com/mon-espace' },
-    { label: 'Revolut',         url: 'https://app.revolut.com' },
-    { label: 'Fortuneo',        url: 'https://www.fortuneo.fr/espace-client' },
+    { label: 'BNP Paribas',      url: 'https://mabanque.bnpparibas.com' },
+    { label: 'Credit Agricole',  url: 'https://www.credit-agricole.fr' },
+    { label: 'Societe Generale', url: 'https://particuliers.societegenerale.fr' },
+    { label: 'LCL',              url: 'https://monespace.lcl.fr' },
+    { label: 'Boursorama',       url: 'https://www.boursorama.com/mon-espace' },
+    { label: 'Revolut',          url: 'https://app.revolut.com' },
+    { label: 'Fortuneo',         url: 'https://www.fortuneo.fr/espace-client' },
   ],
   'loisirs-licences': [
-    { label: 'Netflix',         url: 'https://www.netflix.com/browse' },
-    { label: 'Spotify',         url: 'https://www.spotify.com/fr/account' },
-    { label: 'Disney+',         url: 'https://www.disneyplus.com/fr-fr' },
-    { label: 'Canal+',          url: 'https://www.canalplus.com/espace-client' },
-    { label: 'Amazon Prime',    url: 'https://www.amazon.fr/gp/css/homepage.html' },
-    { label: 'Apple TV+',       url: 'https://tv.apple.com' },
-    { label: 'YouTube Premium', url: 'https://www.youtube.com/premium' },
+    { label: 'Netflix',          url: 'https://www.netflix.com/browse' },
+    { label: 'Spotify',          url: 'https://www.spotify.com/fr/account' },
+    { label: 'Disney+',          url: 'https://www.disneyplus.com/fr-fr' },
+    { label: 'Canal+',           url: 'https://www.canalplus.com/espace-client' },
+    { label: 'Amazon Prime',     url: 'https://www.amazon.fr/gp/css/homepage.html' },
+    { label: 'Apple TV+',        url: 'https://tv.apple.com' },
+    { label: 'YouTube Premium',  url: 'https://www.youtube.com/premium' },
   ],
 }
 
@@ -83,7 +89,8 @@ export default function ModuleDetail({ session }) {
       setForm({
         ...data.champs,
         ...data.credentials,
-        lien_direct: data.lien_direct
+        lien_direct: data.lien_direct,
+        lien_direct_gaz: data.champs?.lien_direct_gaz || '',
       })
     }
     setLoading(false)
@@ -95,6 +102,7 @@ export default function ModuleDetail({ session }) {
     const credentials = {}
 
     config.fields.forEach(f => {
+      if (f.type === 'separator') return
       if (f.sensitive) credentials[f.key] = form[f.key] || ''
       else champs[f.key] = form[f.key] || ''
     })
@@ -123,10 +131,8 @@ export default function ModuleDetail({ session }) {
     setSaving(false)
   }
 
-  const handleOpenLink = () => {
-    if (data?.lien_direct) {
-      window.open(data.lien_direct, '_blank')
-    }
+  const handleOpenLink = (url) => {
+    if (url) window.open(url, '_blank')
   }
 
   if (loading) return (
@@ -136,6 +142,8 @@ export default function ModuleDetail({ session }) {
     </div>
   )
 
+  const lienGaz = data?.champs?.lien_direct_gaz
+
   return (
     <div style={s.container}>
 
@@ -143,8 +151,7 @@ export default function ModuleDetail({ session }) {
       <div style={s.topbar}>
         <button onClick={() => navigate('/')} style={s.back}>←</button>
         <div style={s.titleWrap}>
-          <div style={{...s.groupTag,
-            background: config.bgLight, color: config.color}}>
+          <div style={{...s.groupTag, background: config.bgLight, color: config.color}}>
             {config.groupLabel}
           </div>
           <div style={s.title}>{config.label}</div>
@@ -156,26 +163,53 @@ export default function ModuleDetail({ session }) {
         </button>
       </div>
 
-      {/* ACCES DIRECT */}
+      {/* ACCES DIRECT ELEC */}
       {data?.lien_direct && mode === 'view' && (
         <div style={{...s.accessCard, borderColor: config.color + '40'}}>
           <div style={s.accessLeft}>
             <div style={{...s.accessIcon, background: config.bgLight}}>
-              <svg width="18" height="18" viewBox="0 0 24 24"
-                fill="none" stroke={config.color}
-                strokeWidth="2" strokeLinecap="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke={config.color} strokeWidth="2" strokeLinecap="round">
                 <path d={config.icon}/>
               </svg>
             </div>
             <div>
-              <div style={s.accessTitle}>Acces direct</div>
+              <div style={s.accessTitle}>
+                {groupeId === 'charges' && moduleId === 'energie'
+                  ? 'Electricite' : 'Acces direct'}
+              </div>
               <div style={s.accessUrl}>
                 {data.lien_direct.replace('https://', '').split('/')[0]}
               </div>
             </div>
           </div>
           <button
-            onClick={handleOpenLink}
+            onClick={() => handleOpenLink(data.lien_direct)}
+            style={{...s.accessBtn, background: config.color}}>
+            Ouvrir →
+          </button>
+        </div>
+      )}
+
+      {/* ACCES DIRECT GAZ */}
+      {lienGaz && mode === 'view' && (
+        <div style={{...s.accessCard, borderColor: config.color + '40'}}>
+          <div style={s.accessLeft}>
+            <div style={{...s.accessIcon, background: config.bgLight}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke={config.color} strokeWidth="2" strokeLinecap="round">
+                <path d="M12 2c0 0-8 6-8 12a8 8 0 0 0 16 0c0-6-8-12-8-12z"/>
+              </svg>
+            </div>
+            <div>
+              <div style={s.accessTitle}>Gaz / Fuel</div>
+              <div style={s.accessUrl}>
+                {lienGaz.replace('https://', '').split('/')[0]}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => handleOpenLink(lienGaz)}
             style={{...s.accessBtn, background: config.color}}>
             Ouvrir →
           </button>
@@ -189,30 +223,26 @@ export default function ModuleDetail({ session }) {
             <div style={s.empty}>
               <div style={{fontSize: '40px', marginBottom: '12px'}}>📋</div>
               <div style={s.emptyTitle}>Aucune information</div>
-              <div style={s.emptySub}>
-                Appuie sur ✏️ pour renseigner ce module
-              </div>
-              <button
-                onClick={() => setMode('edit')}
-                style={{...s.saveBtn,
-                  background: config.color, marginTop: '16px'}}>
+              <div style={s.emptySub}>Appuie sur ✏️ pour renseigner ce module</div>
+              <button onClick={() => setMode('edit')}
+                style={{...s.saveBtn, background: config.color, marginTop: '16px'}}>
                 Renseigner maintenant
               </button>
             </div>
           ) : (
             <div style={s.fields}>
-              {config.fields.filter(f => !f.sensitive).map((f, i) => (
-                <div key={f.key} style={{
-                  ...s.fieldRow,
-                  borderBottom: i < config.fields.filter(x => !x.sensitive).length - 1
-                    ? '1px solid rgba(0,0,0,0.05)' : 'none'
-                }}>
-                  <div style={s.fieldLabel}>{f.label}</div>
-                  <div style={s.fieldValue}>
-                    {data.champs?.[f.key] || '—'}
+              {config.fields
+                .filter(f => !f.sensitive && f.type !== 'separator')
+                .map((f, i, arr) => (
+                  <div key={f.key} style={{
+                    ...s.fieldRow,
+                    borderBottom: i < arr.length - 1
+                      ? '1px solid rgba(0,0,0,0.05)' : 'none'
+                  }}>
+                    <div style={s.fieldLabel}>{f.label}</div>
+                    <div style={s.fieldValue}>{data.champs?.[f.key] || '—'}</div>
                   </div>
-                </div>
-              ))}
+                ))}
               {config.fields.filter(f => f.sensitive).length > 0 && (
                 <div style={s.credentialsWrap}>
                   <div style={s.credTitle}>🔐 Identifiants</div>
@@ -234,36 +264,39 @@ export default function ModuleDetail({ session }) {
 
         /* MODE EDIT */
         <div style={s.formWrap}>
-
-          {/* CHAMPS NORMAUX */}
-          {config.fields.map(f => (
-            <div key={f.key} style={s.formField}>
-              <div style={s.formLabel}>
-                {f.sensitive && '🔐 '}{f.label}
+          {config.fields.map(f => {
+            if (f.type === 'separator') return (
+              <div key={f.key} style={s.separator}>
+                <div style={s.separatorLine} />
+                <div style={{...s.separatorLabel, color: config.color}}>{f.label}</div>
+                <div style={s.separatorLine} />
               </div>
-              <input
-                style={s.input}
-                type={f.type || 'text'}
-                placeholder={f.placeholder || ''}
-                value={form[f.key] || ''}
-                onChange={e => setForm({...form, [f.key]: e.target.value})}
-              />
-            </div>
-          ))}
+            )
+            return (
+              <div key={f.key} style={s.formField}>
+                <div style={s.formLabel}>{f.sensitive && '🔐 '}{f.label}</div>
+                <input
+                  style={s.input}
+                  type={f.type || 'text'}
+                  placeholder={f.placeholder || ''}
+                  value={form[f.key] || ''}
+                  onChange={e => setForm({...form, [f.key]: e.target.value})}
+                />
+              </div>
+            )
+          })}
 
-          {/* LIENS PREDEFINIS */}
-          {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`] && (
+          {/* LIENS PREDEFINIS ELEC */}
+          {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-elec`] && (
             <div style={s.formField}>
-              <div style={s.formLabel}>🔗 Choisir le service</div>
+              <div style={s.formLabel}>🔗 Fournisseur electricite</div>
               <div style={s.presetRow}>
-                {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`].map(p => (
-                  <button
-                    key={p.label}
+                {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-elec`].map(p => (
+                  <button key={p.label}
                     onClick={() => setForm({...form, lien_direct: p.url})}
                     style={{
                       ...s.presetBtn,
-                      background: form.lien_direct === p.url
-                        ? config.color : 'white',
+                      background: form.lien_direct === p.url ? config.color : 'white',
                       color: form.lien_direct === p.url ? 'white' : '#555',
                       border: form.lien_direct === p.url
                         ? `1.5px solid ${config.color}`
@@ -273,28 +306,83 @@ export default function ModuleDetail({ session }) {
                   </button>
                 ))}
               </div>
+              <input
+                style={{...s.input, marginTop: '8px'}}
+                type="url" placeholder="https://... (ou saisie manuelle)"
+                value={form.lien_direct || ''}
+                onChange={e => setForm({...form, lien_direct: e.target.value})}
+              />
             </div>
           )}
 
-          {/* LIEN DIRECT MANUEL */}
-          <div style={s.formField}>
-            <div style={s.formLabel}>🔗 Lien direct (espace client)</div>
-            <input
-              style={s.input}
-              type="url"
-              placeholder="https://..."
-              value={form.lien_direct || ''}
-              onChange={e => setForm({...form, lien_direct: e.target.value})}
-            />
-          </div>
+          {/* LIENS PREDEFINIS GAZ */}
+          {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-gaz`] && (
+            <div style={s.formField}>
+              <div style={s.formLabel}>🔗 Fournisseur gaz / fuel</div>
+              <div style={s.presetRow}>
+                {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-gaz`].map(p => (
+                  <button key={p.label}
+                    onClick={() => setForm({...form, lien_direct_gaz: p.url})}
+                    style={{
+                      ...s.presetBtn,
+                      background: form.lien_direct_gaz === p.url ? config.color : 'white',
+                      color: form.lien_direct_gaz === p.url ? 'white' : '#555',
+                      border: form.lien_direct_gaz === p.url
+                        ? `1.5px solid ${config.color}`
+                        : '1.5px solid rgba(0,0,0,0.1)',
+                    }}>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              <input
+                style={{...s.input, marginTop: '8px'}}
+                type="url" placeholder="https://... (ou saisie manuelle)"
+                value={form.lien_direct_gaz || ''}
+                onChange={e => setForm({...form, lien_direct_gaz: e.target.value})}
+              />
+            </div>
+          )}
 
-          <button
-            onClick={handleSave}
-            disabled={saving}
+          {/* LIEN DIRECT SIMPLE (autres modules) */}
+          {!LIENS_PREDEFINIS[`${groupeId}-${moduleId}-elec`] && (
+            <>
+              {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`] && (
+                <div style={s.formField}>
+                  <div style={s.formLabel}>🔗 Choisir le service</div>
+                  <div style={s.presetRow}>
+                    {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`].map(p => (
+                      <button key={p.label}
+                        onClick={() => setForm({...form, lien_direct: p.url})}
+                        style={{
+                          ...s.presetBtn,
+                          background: form.lien_direct === p.url ? config.color : 'white',
+                          color: form.lien_direct === p.url ? 'white' : '#555',
+                          border: form.lien_direct === p.url
+                            ? `1.5px solid ${config.color}`
+                            : '1.5px solid rgba(0,0,0,0.1)',
+                        }}>
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div style={s.formField}>
+                <div style={s.formLabel}>🔗 Lien direct (espace client)</div>
+                <input
+                  style={s.input} type="url" placeholder="https://..."
+                  value={form.lien_direct || ''}
+                  onChange={e => setForm({...form, lien_direct: e.target.value})}
+                />
+              </div>
+            </>
+          )}
+
+          <button onClick={handleSave} disabled={saving}
             style={{...s.saveBtn, background: config.color}}>
             {saving ? 'Sauvegarde...' : 'Sauvegarder'}
           </button>
-
         </div>
       )}
 
@@ -310,13 +398,19 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
       fields: [
-        { key: 'fournisseur',      label: 'Fournisseur',           placeholder: 'EDF, Engie...' },
-        { key: 'numero_client',    label: 'Numero client',         placeholder: '123456789' },
-        { key: 'montant_mensuel',  label: 'Montant mensuel (€)',   placeholder: '80', type: 'number' },
-        { key: 'prelevement_le',   label: 'Prelevement le',        placeholder: '5 du mois' },
-        { key: 'date_fin_contrat', label: 'Fin de contrat',        type: 'date' },
-        { key: 'login',            label: 'Identifiant',           sensitive: true, placeholder: 'email ou ID' },
-        { key: 'password',         label: 'Mot de passe',          sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_elec', label: 'ELECTRICITE', type: 'separator' },
+        { key: 'fournisseur_elec',    label: 'Fournisseur',         placeholder: 'EDF, Engie...' },
+        { key: 'numero_client_elec',  label: 'Numero client',       placeholder: '123456789' },
+        { key: 'montant_elec',        label: 'Montant mensuel (€)', placeholder: '60', type: 'number' },
+        { key: 'prelevement_elec',    label: 'Prelevement le',      placeholder: '5 du mois' },
+        { key: 'login_elec',          label: 'Identifiant',         sensitive: true, placeholder: 'email' },
+        { key: 'password_elec',       label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_gaz', label: 'GAZ / FUEL', type: 'separator' },
+        { key: 'fournisseur_gaz',     label: 'Fournisseur',         placeholder: 'Engie, Primagaz...' },
+        { key: 'numero_client_gaz',   label: 'Numero client',       placeholder: '123456789' },
+        { key: 'montant_gaz',         label: 'Montant mensuel (€)', placeholder: '40', type: 'number' },
+        { key: 'login_gaz',           label: 'Identifiant',         sensitive: true, placeholder: 'email' },
+        { key: 'password_gaz',        label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
       ]
     },
     'charges-operateur': {
@@ -324,13 +418,21 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 4a2 2 0 0 1 2-2h4',
       fields: [
-        { key: 'operateur',           label: 'Operateur',              placeholder: 'SFR, Orange...' },
-        { key: 'numero_ligne',        label: 'Numero de ligne',        placeholder: '06 XX XX XX XX' },
-        { key: 'forfait',             label: 'Forfait',                placeholder: '100Go 5G' },
-        { key: 'montant_mensuel',     label: 'Montant mensuel (€)',    placeholder: '20', type: 'number' },
-        { key: 'date_fin_engagement', label: 'Fin engagement',         type: 'date' },
-        { key: 'login',               label: 'Identifiant',            sensitive: true, placeholder: 'email' },
-        { key: 'password',            label: 'Mot de passe',           sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_tel', label: 'TELEPHONE', type: 'separator' },
+        { key: 'operateur_tel',        label: 'Operateur',           placeholder: 'SFR, Orange...' },
+        { key: 'numero_ligne',         label: 'Numero de ligne',     placeholder: '06 XX XX XX XX' },
+        { key: 'forfait_tel',          label: 'Forfait',             placeholder: '100Go 5G' },
+        { key: 'montant_tel',          label: 'Montant mensuel (€)', placeholder: '20', type: 'number' },
+        { key: 'fin_engagement_tel',   label: 'Fin engagement',      type: 'date' },
+        { key: 'login_tel',            label: 'Identifiant',         sensitive: true, placeholder: 'email' },
+        { key: 'password_tel',         label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_internet', label: 'INTERNET / FIBRE', type: 'separator' },
+        { key: 'operateur_net',        label: 'Operateur',           placeholder: 'Free, Orange...' },
+        { key: 'debit',                label: 'Debit',               placeholder: '1 Gb/s' },
+        { key: 'montant_net',          label: 'Montant mensuel (€)', placeholder: '30', type: 'number' },
+        { key: 'fin_engagement_net',   label: 'Fin engagement',      type: 'date' },
+        { key: 'login_net',            label: 'Identifiant',         sensitive: true, placeholder: 'email' },
+        { key: 'password_net',         label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
       ]
     },
     'charges-impots': {
@@ -350,11 +452,11 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#D85A30', bgLight: '#FAECE7',
       icon: 'M22 12h-4l-3 9L9 3l-3 9H2',
       fields: [
-        { key: 'numero_secu',      label: 'Numero secu',          placeholder: '1 XX XX XX XXX XXX XX' },
-        { key: 'caisse',           label: 'Caisse rattachement',  placeholder: 'CPAM de...' },
-        { key: 'medecin_traitant', label: 'Medecin traitant',     placeholder: 'Dr ...' },
-        { key: 'login',            label: 'Identifiant ameli',    sensitive: true, placeholder: 'Numero secu' },
-        { key: 'password',         label: 'Mot de passe',         sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'numero_secu',      label: 'Numero secu',         placeholder: '1 XX XX XX XXX XXX XX' },
+        { key: 'caisse',           label: 'Caisse rattachement', placeholder: 'CPAM de...' },
+        { key: 'medecin_traitant', label: 'Medecin traitant',    placeholder: 'Dr ...' },
+        { key: 'login',            label: 'Identifiant ameli',   sensitive: true, placeholder: 'Numero secu' },
+        { key: 'password',         label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
       ]
     },
     'assurances-mutuelle': {
@@ -362,12 +464,12 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#D85A30', bgLight: '#FAECE7',
       icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
       fields: [
-        { key: 'assureur',            label: 'Assureur',                placeholder: 'Harmonie, MGEN...' },
-        { key: 'numero_adherent',     label: 'Numero adherent',         placeholder: '123456' },
-        { key: 'cotisation',          label: 'Cotisation mensuelle (€)',placeholder: '60', type: 'number' },
-        { key: 'date_renouvellement', label: 'Renouvellement',          type: 'date' },
-        { key: 'login',               label: 'Identifiant',             sensitive: true, placeholder: 'email' },
-        { key: 'password',            label: 'Mot de passe',            sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'assureur',            label: 'Assureur',                 placeholder: 'Harmonie, MGEN...' },
+        { key: 'numero_adherent',     label: 'Numero adherent',          placeholder: '123456' },
+        { key: 'cotisation',          label: 'Cotisation mensuelle (€)', placeholder: '60', type: 'number' },
+        { key: 'date_renouvellement', label: 'Renouvellement',           type: 'date' },
+        { key: 'login',               label: 'Identifiant',              sensitive: true, placeholder: 'email' },
+        { key: 'password',            label: 'Mot de passe',             sensitive: true, type: 'password', placeholder: '••••••••' },
       ]
     },
     'assurances-biens': {
@@ -375,13 +477,21 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#D85A30', bgLight: '#FAECE7',
       icon: 'M1 3h15v13H1zM16 8h4l3 5v3h-7V8zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
       fields: [
-        { key: 'assureur',       label: 'Assureur',             placeholder: 'AXA, MAIF...' },
-        { key: 'numero_police',  label: 'Numero de police',     placeholder: '123456789' },
-        { key: 'bien_assure',    label: 'Bien assure',          placeholder: 'Maison, Voiture...' },
-        { key: 'prime_annuelle', label: 'Prime annuelle (€)',   placeholder: '400', type: 'number' },
-        { key: 'echeance',       label: 'Echeance annuelle',    type: 'date' },
-        { key: 'login',          label: 'Identifiant',          sensitive: true, placeholder: 'email' },
-        { key: 'password',       label: 'Mot de passe',         sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_maison', label: 'MAISON', type: 'separator' },
+        { key: 'assureur_maison',    label: 'Assureur',           placeholder: 'AXA, MAIF...' },
+        { key: 'numero_police_mais', label: 'Numero de police',   placeholder: '123456789' },
+        { key: 'prime_maison',       label: 'Prime annuelle (€)', placeholder: '300', type: 'number' },
+        { key: 'echeance_maison',    label: 'Echeance',           type: 'date' },
+        { key: 'login_maison',       label: 'Identifiant',        sensitive: true, placeholder: 'email' },
+        { key: 'password_maison',    label: 'Mot de passe',       sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_vehicule', label: 'VEHICULE', type: 'separator' },
+        { key: 'assureur_vehicule',  label: 'Assureur',           placeholder: 'AXA, MACIF...' },
+        { key: 'immatriculation',    label: 'Immatriculation',    placeholder: 'XX-000-XX' },
+        { key: 'numero_police_veh',  label: 'Numero de police',   placeholder: '123456789' },
+        { key: 'prime_vehicule',     label: 'Prime annuelle (€)', placeholder: '400', type: 'number' },
+        { key: 'echeance_vehicule',  label: 'Echeance',           type: 'date' },
+        { key: 'login_vehicule',     label: 'Identifiant',        sensitive: true, placeholder: 'email' },
+        { key: 'password_vehicule',  label: 'Mot de passe',       sensitive: true, type: 'password', placeholder: '••••••••' },
       ]
     },
     'documents-identite': {
@@ -389,12 +499,15 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#5F5E5A', bgLight: '#F1EFE8',
       icon: 'M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM8 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm8-4h4m-4 4h2',
       fields: [
-        { key: 'cni_numero',            label: 'Numero CNI',          placeholder: 'XXXXXXXXX' },
-        { key: 'cni_expiration',        label: 'Expiration CNI',      type: 'date' },
-        { key: 'passeport_numero',      label: 'Numero passeport',    placeholder: 'XX0000000' },
-        { key: 'passeport_expiration',  label: 'Expiration passeport',type: 'date' },
-        { key: 'permis_numero',         label: 'Numero permis',       placeholder: 'XXXXXXXXX' },
-        { key: 'permis_expiration',     label: 'Expiration permis',   type: 'date' },
+        { key: 'sep_cni', label: 'CARTE NATIONALE D IDENTITE', type: 'separator' },
+        { key: 'cni_numero',           label: 'Numero',     placeholder: 'XXXXXXXXX' },
+        { key: 'cni_expiration',       label: 'Expiration', type: 'date' },
+        { key: 'sep_passeport', label: 'PASSEPORT', type: 'separator' },
+        { key: 'passeport_numero',     label: 'Numero',     placeholder: 'XX0000000' },
+        { key: 'passeport_expiration', label: 'Expiration', type: 'date' },
+        { key: 'sep_permis', label: 'PERMIS DE CONDUIRE', type: 'separator' },
+        { key: 'permis_numero',        label: 'Numero',     placeholder: 'XXXXXXXXX' },
+        { key: 'permis_expiration',    label: 'Expiration', type: 'date' },
       ]
     },
     'documents-fidelite': {
@@ -425,7 +538,7 @@ function getModuleConfig(groupeId, moduleId) {
       fields: [
         { key: 'banque',            label: 'Banque',              placeholder: 'BNP, Credit Agricole...' },
         { key: 'derniers_chiffres', label: '4 derniers chiffres', placeholder: '4242', type: 'number' },
-        { key: 'type',              label: 'Type',                placeholder: 'Visa, Mastercard...' },
+        { key: 'type_carte',        label: 'Type',                placeholder: 'Visa, Mastercard...' },
         { key: 'expiration',        label: 'Expiration',          placeholder: 'MM/AA' },
       ]
     },
@@ -437,7 +550,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'etablissement', label: 'Etablissement', placeholder: 'Banque, assureur...' },
         { key: 'type',          label: 'Type',          placeholder: 'Livret A, PEL, PEA...' },
         { key: 'solde',         label: 'Solde (€)',     placeholder: '5000', type: 'number' },
-        { key: 'taux',          label: 'Taux (%)',      placeholder: '3', type: 'number' },
+        { key: 'taux',          label: 'Taux (%)',      placeholder: '3',    type: 'number' },
       ]
     },
     'portefeuille-budget': {
@@ -445,10 +558,10 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#1D9E75', bgLight: '#E1F5EE',
       icon: 'M3 3h18v18H3zM3 9h18M9 21V9',
       fields: [
-        { key: 'revenus',        label: 'Revenus mensuels (€)',  placeholder: '2500', type: 'number' },
-        { key: 'charges_fixes',  label: 'Charges fixes (€)',     placeholder: '1200', type: 'number' },
-        { key: 'budget_courses', label: 'Budget courses (€)',    placeholder: '400',  type: 'number' },
-        { key: 'budget_loisirs', label: 'Budget loisirs (€)',    placeholder: '200',  type: 'number' },
+        { key: 'revenus',        label: 'Revenus mensuels (€)', placeholder: '2500', type: 'number' },
+        { key: 'charges_fixes',  label: 'Charges fixes (€)',    placeholder: '1200', type: 'number' },
+        { key: 'budget_courses', label: 'Budget courses (€)',   placeholder: '400',  type: 'number' },
+        { key: 'budget_loisirs', label: 'Budget loisirs (€)',   placeholder: '200',  type: 'number' },
       ]
     },
     'organisation-rdvs': {
@@ -500,12 +613,12 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#7F77DD', bgLight: '#EEEDFE',
       icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',
       fields: [
-        { key: 'service',       label: 'Service',          placeholder: 'Netflix, Spotify...' },
-        { key: 'prix_mensuel',  label: 'Prix mensuel (€)', placeholder: '10', type: 'number' },
-        { key: 'compte',        label: 'Compte email',     placeholder: 'email@...' },
-        { key: 'renouvellement',label: 'Renouvellement',   type: 'date' },
-        { key: 'login',         label: 'Identifiant',      sensitive: true, placeholder: 'email' },
-        { key: 'password',      label: 'Mot de passe',     sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'service',        label: 'Service',          placeholder: 'Netflix, Spotify...' },
+        { key: 'prix_mensuel',   label: 'Prix mensuel (€)', placeholder: '10', type: 'number' },
+        { key: 'compte',         label: 'Compte email',     placeholder: 'email@...' },
+        { key: 'renouvellement', label: 'Renouvellement',   type: 'date' },
+        { key: 'login',          label: 'Identifiant',      sensitive: true, placeholder: 'email' },
+        { key: 'password',       label: 'Mot de passe',     sensitive: true, type: 'password', placeholder: '••••••••' },
       ]
     },
     'loisirs-souvenirs': {
@@ -545,7 +658,7 @@ const s = {
   title: { fontSize: '15px', fontWeight: '700', color: '#1a1510' },
   editBtn: { background: 'none', border: 'none', fontSize: '16px',
     cursor: 'pointer', padding: '4px 8px' },
-  accessCard: { margin: '12px 14px', background: 'white', borderRadius: '14px',
+  accessCard: { margin: '12px 14px 0', background: 'white', borderRadius: '14px',
     padding: '12px 14px', display: 'flex', alignItems: 'center',
     justifyContent: 'space-between', border: '1.5px solid',
     boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
@@ -558,8 +671,7 @@ const s = {
     color: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
   viewWrap: { padding: '12px 14px' },
   empty: { textAlign: 'center', padding: '40px 24px' },
-  emptyTitle: { fontSize: '16px', fontWeight: '600',
-    color: '#1a1510', marginBottom: '6px' },
+  emptyTitle: { fontSize: '16px', fontWeight: '600', color: '#1a1510', marginBottom: '6px' },
   emptySub: { fontSize: '12px', color: '#bbb', lineHeight: '1.5' },
   fields: { background: 'white', borderRadius: '14px',
     overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' },
@@ -580,7 +692,12 @@ const s = {
     border: '1px solid rgba(0,0,0,0.1)', fontSize: '13px',
     background: 'white', outline: 'none',
     fontFamily: 'system-ui, sans-serif', boxSizing: 'border-box' },
-  presetRow: { display: 'flex', gap: '7px', flexWrap: 'wrap' },
+  separator: { display: 'flex', alignItems: 'center', gap: '8px',
+    margin: '16px 0 12px' },
+  separatorLine: { flex: 1, height: '1px', background: 'rgba(0,0,0,0.08)' },
+  separatorLabel: { fontSize: '10px', fontWeight: '700',
+    textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' },
+  presetRow: { display: 'flex', gap: '7px', flexWrap: 'wrap', marginBottom: '4px' },
   presetBtn: { padding: '6px 12px', borderRadius: '10px',
     fontSize: '12px', fontWeight: '500', cursor: 'pointer' },
   saveBtn: { width: '100%', padding: '12px', borderRadius: '12px',
