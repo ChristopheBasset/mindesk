@@ -87,12 +87,12 @@ export default function Home({ session, onLock }) {
               🔐 Activer le code PIN
             </button>
           )}
-          {pinActive && (
+          {!pinActive && window.innerWidth < 768 && (
             <button onClick={() => onLock()} style={{...s.actionBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
               🔒 Verrouiller
             </button>
           )}
-          {!bioActive && (
+          {!bioActive && window.innerWidth < 768 && (
             <button onClick={() => navigate('/setup-biometric')} style={{...s.actionBtn, color: '#1D9E75', borderColor: 'rgba(29,158,117,0.2)'}}>
               👆 Activer l empreinte
             </button>
