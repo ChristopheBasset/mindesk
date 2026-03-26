@@ -14,36 +14,37 @@ export default function Login() {
   const savedEmail = localStorage.getItem('mindesk_email')
 
   const handleEmailLogin = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error) {
-      localStorage.setItem('mindesk_email', email)
-    } else {
-      setError('Email ou mot de passe incorrect')
-    }
-    setLoading(false)
+  e.preventDefault()
+  setLoading(true)
+  setError(null)
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if (!error) {
+    localStorage.setItem('mindesk_email', email)
+    localStorage.setItem('mindesk_pwd', password)
+  } else {
+    setError('Email ou mot de passe incorrect')
   }
+  setLoading(false)
+}
 
   const handlePinDigit = async (d) => {
     const newPin = pin + d
     setPin(newPin)
-    if (newPin.length === 4) {
-      if (newPin === pinCode) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: savedEmail,
-          password: localStorage.getItem('mindesk_pwd')
-        })
-        if (error) {
-          setError('Session expiree, utilise email + mot de passe')
-          setMode('email')
-        }
-      } else {
-        setError('Code incorrect')
-        setPin('')
-        setTimeout(() => setError(''), 2000)
-      }
+    if (newPin === pinCode) {
+  const savedPwd = localStorage.getItem('mindesk_pwd')
+  const { error } = await supabase.auth.signInWithPassword({
+    email: savedEmail,
+    password: savedPwd
+  })
+  if (error) {
+    setError('Session expiree, utilise email + mot de passe')
+    setTimeout(() => { setMode('email') }, 2000)
+  }
+} else {
+  setError('Code incorrect')
+  setPin('')
+  setTimeout(() => setError(''), 2000)
+}
     }
   }
 
