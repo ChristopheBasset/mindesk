@@ -133,14 +133,23 @@ export default function App() {
       }
     })
 
-    // Verrouillage automatique quand l'app passe en arriere-plan
+    // Verrouillage automatique avec timestamp
     const handleVisibilityChange = () => {
+      const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
+      const pinCode = localStorage.getItem('mindesk_pin')
+      if (!pinActive || !pinCode) return
+
       if (document.visibilityState === 'hidden') {
-        const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
-        const pinCode = localStorage.getItem('mindesk_pin')
-        if (pinActive && pinCode) {
-          setLocked(true)
-          setUnlockedBy(null)
+        localStorage.setItem('mindesk_locked_at', Date.now().toString())
+      } else if (document.visibilityState === 'visible') {
+        const lockedAt = localStorage.getItem('mindesk_locked_at')
+        if (lockedAt) {
+          const elapsed = Date.now() - parseInt(lockedAt)
+          if (elapsed > 30000) {
+            setLocked(true)
+            setUnlockedBy(null)
+          }
+          localStorage.removeItem('mindesk_locked_at')
         }
       }
     }
