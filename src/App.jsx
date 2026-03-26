@@ -10,6 +10,8 @@ import SetupPin from './pages/SetupPin'
 import SetupBiometric from './pages/SetupBiometric'
 import Portefeuille from './pages/Portefeuille'
 import ModuleDetail from './pages/modules/ModuleDetail'
+import ModuleList from './pages/modules/ModuleList'
+import { LIST_MODULE_KEYS } from './pages/modules/ModuleList'
 
 function PinLock({ onSuccess }) {
   const [pin, setPin] = useState('')
@@ -152,7 +154,15 @@ export default function App() {
         <Route path="/register" element={session ? <Navigate to="/" /> : <Register />} />
         <Route path="*" element={<Navigate to="/" />} />
         <Route path="/portefeuille" element={session ? <Portefeuille session={session} /> : <Navigate to="/" />} />
-        <Route path="/module/:groupeId/:moduleId" element={session ? <ModuleDetail session={session} /> : <Navigate to="/" />} />
+        <Route path="/module/:groupeId/:moduleId" element={
+  session ? (
+    LIST_MODULE_KEYS.includes(
+      window.location.pathname.split('/module/')[1]?.replace('/', '-')
+    )
+      ? <ModuleList session={session} />
+      : <ModuleDetail session={session} />
+  ) : <Navigate to="/" />
+} />
       </Routes>
     </BrowserRouter>
   )
