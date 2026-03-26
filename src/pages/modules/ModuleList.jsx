@@ -309,6 +309,9 @@ export default function ModuleList({ session }) {
         </div>
       ) : (
         <div style={s.listWrap}>
+          <div style={{textAlign: 'center', fontSize: '11px', color: '#bbb', padding: '4px 0 8px'}}>
+            Appuie sur une ligne pour modifier
+          </div>
           {items.map(item => (
             <div key={item.id} style={s.itemCard}>
               <div style={s.itemLeft} onClick={() => handleEdit(item)}>

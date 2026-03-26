@@ -219,6 +219,16 @@ export default function ModuleDetail({ session }) {
               <div style={s.emptySub}>Ajoute un lien direct via le bouton +</div>
             </div>
           )}
+          {data && (
+            <div style={{textAlign: 'center', padding: '12px 0 4px'}}>
+              <button
+                onClick={() => setMode('edit')}
+                style={{background: 'none', border: 'none', color: '#bbb',
+                  fontSize: '12px', cursor: 'pointer', textDecoration: 'underline'}}>
+                ✏️ Modifier les informations
+              </button>
+            </div>
+          )}
           {false && (
             <div style={s.fields}>
               {config.fields.filter(f => !f.sensitive && f.type !== 'separator' && data?.champs?.[f.key]).map((f, i, arr) => (
