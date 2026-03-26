@@ -11,17 +11,22 @@ const LIENS_PREDEFINIS = {
     { label: 'Ekwateur',       url: 'https://app.ekwateur.fr' },
   ],
   'charges-energie-gaz': [
-    { label: 'Engie Gaz',  url: 'https://particuliers.engie.fr/espace-client' },
-    { label: 'Primagaz',   url: 'https://www.primagaz.fr/espace-client' },
-    { label: 'Vitogaz',    url: 'https://www.vitogaz.fr/espace-client' },
-    { label: 'DomOil',     url: 'https://www.domoil.fr' },
+    { label: 'Engie Gaz', url: 'https://particuliers.engie.fr/espace-client' },
+    { label: 'Primagaz',  url: 'https://www.primagaz.fr/espace-client' },
+    { label: 'Vitogaz',   url: 'https://www.vitogaz.fr/espace-client' },
+    { label: 'DomOil',    url: 'https://www.domoil.fr' },
   ],
-  'charges-operateur': [
-    { label: 'SFR',        url: 'https://www.sfr.fr/mon-espace-sfr' },
-    { label: 'Orange',     url: 'https://espaceclient.orange.fr' },
-    { label: 'Free Mobile',url: 'https://mobile.free.fr/account' },
-    { label: 'Bouygues',   url: 'https://www.bouyguestelecom.fr/mon-compte' },
-    { label: 'Free Fibre', url: 'https://adsl.free.fr/login.pl' },
+  'charges-operateur-tel': [
+    { label: 'SFR',         url: 'https://www.sfr.fr/mon-espace-sfr' },
+    { label: 'Orange',      url: 'https://espaceclient.orange.fr' },
+    { label: 'Free Mobile', url: 'https://mobile.free.fr/account' },
+    { label: 'Bouygues',    url: 'https://www.bouyguestelecom.fr/mon-compte' },
+  ],
+  'charges-operateur-net': [
+    { label: 'Free Fibre',  url: 'https://adsl.free.fr/login.pl' },
+    { label: 'Orange Fibre',url: 'https://espaceclient.orange.fr' },
+    { label: 'SFR Box',     url: 'https://www.sfr.fr/mon-espace-sfr' },
+    { label: 'Bouygues Box',url: 'https://www.bouyguestelecom.fr/mon-compte' },
   ],
   'charges-impots': [
     { label: 'Impots.gouv', url: 'https://cfspart.impots.gouv.fr' },
@@ -36,12 +41,18 @@ const LIENS_PREDEFINIS = {
     { label: 'Alan',     url: 'https://alan.com/fr-fr' },
     { label: 'April',    url: 'https://www.april.fr/espace-client' },
   ],
-  'assurances-biens': [
+  'assurances-biens-maison': [
     { label: 'AXA',      url: 'https://www.axa.fr/mon-espace-client' },
     { label: 'MAIF',     url: 'https://www.maif.fr/espace-client' },
     { label: 'MACIF',    url: 'https://www.macif.fr/assurance/particuliers/espace-client' },
     { label: 'Groupama', url: 'https://www.groupama.fr/espace-client' },
     { label: 'Allianz',  url: 'https://www.allianz.fr/espace-client' },
+  ],
+  'assurances-biens-vehicule': [
+    { label: 'AXA',      url: 'https://www.axa.fr/mon-espace-client' },
+    { label: 'MAIF',     url: 'https://www.maif.fr/espace-client' },
+    { label: 'MACIF',    url: 'https://www.macif.fr/assurance/particuliers/espace-client' },
+    { label: 'Groupama', url: 'https://www.groupama.fr/espace-client' },
   ],
   'portefeuille-cb': [
     { label: 'BNP Paribas',      url: 'https://mabanque.bnpparibas.com' },
@@ -50,16 +61,15 @@ const LIENS_PREDEFINIS = {
     { label: 'LCL',              url: 'https://monespace.lcl.fr' },
     { label: 'Boursorama',       url: 'https://www.boursorama.com/mon-espace' },
     { label: 'Revolut',          url: 'https://app.revolut.com' },
-    { label: 'Fortuneo',         url: 'https://www.fortuneo.fr/espace-client' },
   ],
   'loisirs-licences': [
-    { label: 'Netflix',          url: 'https://www.netflix.com/browse' },
-    { label: 'Spotify',          url: 'https://www.spotify.com/fr/account' },
-    { label: 'Disney+',          url: 'https://www.disneyplus.com/fr-fr' },
-    { label: 'Canal+',           url: 'https://www.canalplus.com/espace-client' },
-    { label: 'Amazon Prime',     url: 'https://www.amazon.fr/gp/css/homepage.html' },
-    { label: 'Apple TV+',        url: 'https://tv.apple.com' },
-    { label: 'YouTube Premium',  url: 'https://www.youtube.com/premium' },
+    { label: 'Netflix',         url: 'https://www.netflix.com/browse' },
+    { label: 'Spotify',         url: 'https://www.spotify.com/fr/account' },
+    { label: 'Disney+',         url: 'https://www.disneyplus.com/fr-fr' },
+    { label: 'Canal+',          url: 'https://www.canalplus.com/espace-client' },
+    { label: 'Amazon Prime',    url: 'https://www.amazon.fr/gp/css/homepage.html' },
+    { label: 'Apple TV+',       url: 'https://tv.apple.com' },
+    { label: 'YouTube Premium', url: 'https://www.youtube.com/premium' },
   ],
 }
 
@@ -71,6 +81,7 @@ export default function ModuleDetail({ session }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({})
+  const [copiedKey, setCopiedKey] = useState(null)
 
   const config = getModuleConfig(groupeId, moduleId)
 
@@ -89,8 +100,7 @@ export default function ModuleDetail({ session }) {
       setForm({
         ...data.champs,
         ...data.credentials,
-        lien_direct: data.lien_direct,
-        lien_direct_gaz: data.champs?.lien_direct_gaz || '',
+        lien_direct: data.lien_direct || '',
       })
     }
     setLoading(false)
@@ -100,7 +110,6 @@ export default function ModuleDetail({ session }) {
     setSaving(true)
     const champs = {}
     const credentials = {}
-
     config.fields.forEach(f => {
       if (f.type === 'separator') return
       if (f.sensitive) credentials[f.key] = form[f.key] || ''
@@ -109,45 +118,48 @@ export default function ModuleDetail({ session }) {
 
     if (data) {
       await supabase.from('modules_data').update({
-        champs,
-        credentials,
+        champs, credentials,
         lien_direct: form.lien_direct || null,
         updated_at: new Date().toISOString()
       }).eq('id', data.id)
     } else {
       await supabase.from('modules_data').insert({
         user_id: session.user.id,
-        groupe: groupeId,
-        module: moduleId,
-        label: config.label,
-        champs,
-        credentials,
+        groupe: groupeId, module: moduleId,
+        label: config.label, champs, credentials,
         lien_direct: form.lien_direct || null,
       })
     }
-
     await loadData()
     setMode('view')
     setSaving(false)
   }
 
-  const handleOpenLink = (url) => {
-    if (url) window.open(url, '_blank')
+  const handleOpenLink = async (url, pwdKey) => {
+    if (!url) return
+    const pwd = data?.credentials?.[pwdKey]
+    if (pwd) {
+      try {
+        await navigator.clipboard.writeText(pwd)
+        setCopiedKey(pwdKey)
+        setTimeout(() => setCopiedKey(null), 3000)
+      } catch (e) {}
+    }
+    setTimeout(() => window.open(url, '_blank'), 400)
   }
 
   if (loading) return (
-    <div style={{...s.container, display: 'flex',
-      alignItems: 'center', justifyContent: 'center'}}>
-      <div style={{color: '#bbb', fontSize: '13px'}}>Chargement...</div>
+    <div style={{...s.container, display:'flex', alignItems:'center', justifyContent:'center'}}>
+      <div style={{color:'#bbb', fontSize:'13px'}}>Chargement...</div>
     </div>
   )
 
-  const lienGaz = data?.champs?.lien_direct_gaz
+  // Construit la liste des accès directs selon le module
+  const accesDirects = buildAccesDirect(groupeId, moduleId, data, config)
 
   return (
     <div style={s.container}>
 
-      {/* TOPBAR */}
       <div style={s.topbar}>
         <button onClick={() => navigate('/')} style={s.back}>←</button>
         <div style={s.titleWrap}>
@@ -156,93 +168,56 @@ export default function ModuleDetail({ session }) {
           </div>
           <div style={s.title}>{config.label}</div>
         </div>
-        <button
-          onClick={() => setMode(mode === 'edit' ? 'view' : 'edit')}
-          style={s.editBtn}>
+        <button onClick={() => setMode(mode === 'edit' ? 'view' : 'edit')} style={s.editBtn}>
           {mode === 'edit' ? '✕' : '✏️'}
         </button>
       </div>
 
-      {/* ACCES DIRECT ELEC */}
-      {data?.lien_direct && mode === 'view' && (
-        <div style={{...s.accessCard, borderColor: config.color + '40'}}>
+      {/* ACCES DIRECTS */}
+      {mode === 'view' && accesDirects.map(a => (
+        <div key={a.key} style={{...s.accessCard, borderColor: config.color + '40'}}>
           <div style={s.accessLeft}>
             <div style={{...s.accessIcon, background: config.bgLight}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                 stroke={config.color} strokeWidth="2" strokeLinecap="round">
-                <path d={config.icon}/>
+                <path d={a.icon || config.icon}/>
               </svg>
             </div>
             <div>
-              <div style={s.accessTitle}>
-                {groupeId === 'charges' && moduleId === 'energie'
-                  ? 'Electricite' : 'Acces direct'}
-              </div>
-              <div style={s.accessUrl}>
-                {data.lien_direct.replace('https://', '').split('/')[0]}
-              </div>
+              <div style={s.accessTitle}>{a.label}</div>
+              <div style={s.accessUrl}>{a.url.replace('https://', '').split('/')[0]}</div>
             </div>
           </div>
           <button
-            onClick={() => handleOpenLink(data.lien_direct)}
-            style={{...s.accessBtn, background: config.color}}>
-            Ouvrir →
+            onClick={() => handleOpenLink(a.url, a.pwdKey)}
+            style={{...s.accessBtn, background: config.color,
+              fontSize: copiedKey === a.pwdKey ? '10px' : '12px'}}>
+            {copiedKey === a.pwdKey ? '✓ MDP copie !' : 'Ouvrir →'}
           </button>
         </div>
-      )}
+      ))}
 
-      {/* ACCES DIRECT GAZ */}
-      {lienGaz && mode === 'view' && (
-        <div style={{...s.accessCard, borderColor: config.color + '40'}}>
-          <div style={s.accessLeft}>
-            <div style={{...s.accessIcon, background: config.bgLight}}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                stroke={config.color} strokeWidth="2" strokeLinecap="round">
-                <path d="M12 2c0 0-8 6-8 12a8 8 0 0 0 16 0c0-6-8-12-8-12z"/>
-              </svg>
-            </div>
-            <div>
-              <div style={s.accessTitle}>Gaz / Fuel</div>
-              <div style={s.accessUrl}>
-                {lienGaz.replace('https://', '').split('/')[0]}
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={() => handleOpenLink(lienGaz)}
-            style={{...s.accessBtn, background: config.color}}>
-            Ouvrir →
-          </button>
-        </div>
-      )}
-
-      {/* MODE VIEW */}
       {mode === 'view' ? (
         <div style={s.viewWrap}>
           {!data ? (
             <div style={s.empty}>
-              <div style={{fontSize: '40px', marginBottom: '12px'}}>📋</div>
+              <div style={{fontSize:'40px', marginBottom:'12px'}}>📋</div>
               <div style={s.emptyTitle}>Aucune information</div>
               <div style={s.emptySub}>Appuie sur ✏️ pour renseigner ce module</div>
               <button onClick={() => setMode('edit')}
-                style={{...s.saveBtn, background: config.color, marginTop: '16px'}}>
+                style={{...s.saveBtn, background: config.color, marginTop:'16px'}}>
                 Renseigner maintenant
               </button>
             </div>
           ) : (
             <div style={s.fields}>
-              {config.fields
-                .filter(f => !f.sensitive && f.type !== 'separator')
-                .map((f, i, arr) => (
-                  <div key={f.key} style={{
-                    ...s.fieldRow,
-                    borderBottom: i < arr.length - 1
-                      ? '1px solid rgba(0,0,0,0.05)' : 'none'
-                  }}>
-                    <div style={s.fieldLabel}>{f.label}</div>
-                    <div style={s.fieldValue}>{data.champs?.[f.key] || '—'}</div>
-                  </div>
-                ))}
+              {config.fields.filter(f => !f.sensitive && f.type !== 'separator').map((f, i, arr) => (
+                <div key={f.key} style={{...s.fieldRow,
+                  borderBottom: i < arr.length-1 ? '1px solid rgba(0,0,0,0.05)' : 'none'}}>
+                  <div style={s.fieldLabel}>{f.label}</div>
+                  <div style={s.fieldValue}>{data.champs?.[f.key] || '—'}</div>
+                </div>
+              ))}
               {config.fields.filter(f => f.sensitive).length > 0 && (
                 <div style={s.credentialsWrap}>
                   <div style={s.credTitle}>🔐 Identifiants</div>
@@ -261,101 +236,65 @@ export default function ModuleDetail({ session }) {
         </div>
 
       ) : (
-
-        /* MODE EDIT */
         <div style={s.formWrap}>
           {config.fields.map(f => {
             if (f.type === 'separator') return (
               <div key={f.key} style={s.separator}>
-                <div style={s.separatorLine} />
+                <div style={s.separatorLine}/>
                 <div style={{...s.separatorLabel, color: config.color}}>{f.label}</div>
-                <div style={s.separatorLine} />
+                <div style={s.separatorLine}/>
               </div>
             )
             return (
               <div key={f.key} style={s.formField}>
                 <div style={s.formLabel}>{f.sensitive && '🔐 '}{f.label}</div>
-                <input
-                  style={s.input}
-                  type={f.type || 'text'}
+                <input style={s.input} type={f.type || 'text'}
                   placeholder={f.placeholder || ''}
                   value={form[f.key] || ''}
-                  onChange={e => setForm({...form, [f.key]: e.target.value})}
-                />
+                  onChange={e => setForm({...form, [f.key]: e.target.value})} />
               </div>
             )
           })}
 
-          {/* LIENS PREDEFINIS ELEC */}
-          {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-elec`] && (
-            <div style={s.formField}>
-              <div style={s.formLabel}>🔗 Fournisseur electricite</div>
-              <div style={s.presetRow}>
-                {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-elec`].map(p => (
-                  <button key={p.label}
-                    onClick={() => setForm({...form, lien_direct: p.url})}
-                    style={{
-                      ...s.presetBtn,
-                      background: form.lien_direct === p.url ? config.color : 'white',
-                      color: form.lien_direct === p.url ? 'white' : '#555',
-                      border: form.lien_direct === p.url
-                        ? `1.5px solid ${config.color}`
-                        : '1.5px solid rgba(0,0,0,0.1)',
-                    }}>
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-              <input
-                style={{...s.input, marginTop: '8px'}}
-                type="url" placeholder="https://... (ou saisie manuelle)"
-                value={form.lien_direct || ''}
-                onChange={e => setForm({...form, lien_direct: e.target.value})}
-              />
+          {/* LIENS PREDEFINIS par sous-section */}
+          {config.lienSections && config.lienSections.map(ls => (
+            <div key={ls.key} style={s.formField}>
+              <div style={s.formLabel}>🔗 {ls.label}</div>
+              {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-${ls.key}`] && (
+                <div style={s.presetRow}>
+                  {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-${ls.key}`].map(p => (
+                    <button key={p.label}
+                      onClick={() => setForm({...form, [ls.formKey]: p.url})}
+                      style={{...s.presetBtn,
+                        background: form[ls.formKey] === p.url ? config.color : 'white',
+                        color: form[ls.formKey] === p.url ? 'white' : '#555',
+                        border: form[ls.formKey] === p.url
+                          ? `1.5px solid ${config.color}`
+                          : '1.5px solid rgba(0,0,0,0.1)',
+                      }}>
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <input style={{...s.input, marginTop:'8px'}} type="url"
+                placeholder="https://... ou saisie manuelle"
+                value={form[ls.formKey] || ''}
+                onChange={e => setForm({...form, [ls.formKey]: e.target.value})} />
             </div>
-          )}
+          ))}
 
-          {/* LIENS PREDEFINIS GAZ */}
-          {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-gaz`] && (
+          {/* LIEN DIRECT SIMPLE (modules sans sous-sections) */}
+          {!config.lienSections && (
             <div style={s.formField}>
-              <div style={s.formLabel}>🔗 Fournisseur gaz / fuel</div>
-              <div style={s.presetRow}>
-                {LIENS_PREDEFINIS[`${groupeId}-${moduleId}-gaz`].map(p => (
-                  <button key={p.label}
-                    onClick={() => setForm({...form, lien_direct_gaz: p.url})}
-                    style={{
-                      ...s.presetBtn,
-                      background: form.lien_direct_gaz === p.url ? config.color : 'white',
-                      color: form.lien_direct_gaz === p.url ? 'white' : '#555',
-                      border: form.lien_direct_gaz === p.url
-                        ? `1.5px solid ${config.color}`
-                        : '1.5px solid rgba(0,0,0,0.1)',
-                    }}>
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-              <input
-                style={{...s.input, marginTop: '8px'}}
-                type="url" placeholder="https://... (ou saisie manuelle)"
-                value={form.lien_direct_gaz || ''}
-                onChange={e => setForm({...form, lien_direct_gaz: e.target.value})}
-              />
-            </div>
-          )}
-
-          {/* LIEN DIRECT SIMPLE (autres modules) */}
-          {!LIENS_PREDEFINIS[`${groupeId}-${moduleId}-elec`] && (
-            <>
               {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`] && (
-                <div style={s.formField}>
+                <>
                   <div style={s.formLabel}>🔗 Choisir le service</div>
-                  <div style={s.presetRow}>
+                  <div style={{...s.presetRow, marginBottom:'8px'}}>
                     {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`].map(p => (
                       <button key={p.label}
                         onClick={() => setForm({...form, lien_direct: p.url})}
-                        style={{
-                          ...s.presetBtn,
+                        style={{...s.presetBtn,
                           background: form.lien_direct === p.url ? config.color : 'white',
                           color: form.lien_direct === p.url ? 'white' : '#555',
                           border: form.lien_direct === p.url
@@ -366,17 +305,13 @@ export default function ModuleDetail({ session }) {
                       </button>
                     ))}
                   </div>
-                </div>
+                </>
               )}
-              <div style={s.formField}>
-                <div style={s.formLabel}>🔗 Lien direct (espace client)</div>
-                <input
-                  style={s.input} type="url" placeholder="https://..."
-                  value={form.lien_direct || ''}
-                  onChange={e => setForm({...form, lien_direct: e.target.value})}
-                />
-              </div>
-            </>
+              <div style={s.formLabel}>🔗 Lien direct</div>
+              <input style={s.input} type="url" placeholder="https://..."
+                value={form.lien_direct || ''}
+                onChange={e => setForm({...form, lien_direct: e.target.value})} />
+            </div>
           )}
 
           <button onClick={handleSave} disabled={saving}
@@ -391,48 +326,118 @@ export default function ModuleDetail({ session }) {
   )
 }
 
+// Construit les boutons d'accès direct selon les données sauvegardées
+function buildAccesDirect(groupeId, moduleId, data, config) {
+  if (!data) return []
+  const c = data.champs || {}
+  const cr = data.credentials || {}
+
+  if (groupeId === 'charges' && moduleId === 'energie') {
+    const list = []
+    if (data.lien_direct) list.push({
+      key: 'elec', label: c.fournisseur_elec || 'Electricite',
+      url: data.lien_direct, pwdKey: 'password_elec',
+      icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z'
+    })
+    if (c.lien_direct_gaz) list.push({
+      key: 'gaz', label: c.fournisseur_gaz || 'Gaz / Fuel',
+      url: c.lien_direct_gaz, pwdKey: 'password_gaz',
+      icon: 'M12 2c0 0-8 6-8 12a8 8 0 0 0 16 0c0-6-8-12-8-12z'
+    })
+    return list
+  }
+
+  if (groupeId === 'charges' && moduleId === 'operateur') {
+    const list = []
+    if (data.lien_direct) list.push({
+      key: 'tel', label: c.operateur_tel || 'Telephone',
+      url: data.lien_direct, pwdKey: 'password_tel',
+      icon: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 4a2 2 0 0 1 2-2h4'
+    })
+    if (c.lien_direct_net) list.push({
+      key: 'net', label: c.operateur_net || 'Internet',
+      url: c.lien_direct_net, pwdKey: 'password_net',
+      icon: 'M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 0c0 0-4 4-4 10s4 10 4 10 4-4 4-10-4-10-4-10zM2 12h20'
+    })
+    return list
+  }
+
+  if (groupeId === 'assurances' && moduleId === 'biens') {
+    const list = []
+    if (data.lien_direct) list.push({
+      key: 'maison', label: c.assureur_maison || 'Maison',
+      url: data.lien_direct, pwdKey: 'password_maison',
+      icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'
+    })
+    if (c.lien_direct_vehicule) list.push({
+      key: 'vehicule', label: c.assureur_vehicule || 'Vehicule',
+      url: c.lien_direct_vehicule, pwdKey: 'password_vehicule',
+      icon: 'M1 3h15v13H1zM16 8h4l3 5v3h-7V8z'
+    })
+    return list
+  }
+
+  // Cas simple — un seul lien
+  if (data.lien_direct) return [{
+    key: 'main', label: 'Acces direct',
+    url: data.lien_direct, pwdKey: 'password',
+    icon: config.icon
+  }]
+  return []
+}
+
 function getModuleConfig(groupeId, moduleId) {
   const configs = {
     'charges-energie': {
       label: 'Electricite / Gaz', groupLabel: 'Mes charges',
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
+      lienSections: [
+        { key: 'elec', label: 'Fournisseur electricite', formKey: 'lien_direct' },
+        { key: 'gaz',  label: 'Fournisseur gaz / fuel',  formKey: 'lien_direct_gaz' },
+      ],
       fields: [
-        { key: 'sep_elec', label: 'ELECTRICITE', type: 'separator' },
-        { key: 'fournisseur_elec',    label: 'Fournisseur',         placeholder: 'EDF, Engie...' },
-        { key: 'numero_client_elec',  label: 'Numero client',       placeholder: '123456789' },
-        { key: 'montant_elec',        label: 'Montant mensuel (€)', placeholder: '60', type: 'number' },
-        { key: 'prelevement_elec',    label: 'Prelevement le',      placeholder: '5 du mois' },
-        { key: 'login_elec',          label: 'Identifiant',         sensitive: true, placeholder: 'email' },
-        { key: 'password_elec',       label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
-        { key: 'sep_gaz', label: 'GAZ / FUEL', type: 'separator' },
-        { key: 'fournisseur_gaz',     label: 'Fournisseur',         placeholder: 'Engie, Primagaz...' },
-        { key: 'numero_client_gaz',   label: 'Numero client',       placeholder: '123456789' },
-        { key: 'montant_gaz',         label: 'Montant mensuel (€)', placeholder: '40', type: 'number' },
-        { key: 'login_gaz',           label: 'Identifiant',         sensitive: true, placeholder: 'email' },
-        { key: 'password_gaz',        label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_elec',           label: 'ELECTRICITE',         type: 'separator' },
+        { key: 'fournisseur_elec',   label: 'Fournisseur',         placeholder: 'EDF, Engie...' },
+        { key: 'numero_client_elec', label: 'Numero client',       placeholder: '123456789' },
+        { key: 'montant_elec',       label: 'Montant mensuel (€)', placeholder: '60', type: 'number' },
+        { key: 'prelevement_elec',   label: 'Prelevement le',      placeholder: '5 du mois' },
+        { key: 'login_elec',         label: 'Identifiant',         sensitive: true, placeholder: 'email' },
+        { key: 'password_elec',      label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_gaz',            label: 'GAZ / FUEL',          type: 'separator' },
+        { key: 'fournisseur_gaz',    label: 'Fournisseur',         placeholder: 'Engie, Primagaz...' },
+        { key: 'numero_client_gaz',  label: 'Numero client',       placeholder: '123456789' },
+        { key: 'montant_gaz',        label: 'Montant mensuel (€)', placeholder: '40', type: 'number' },
+        { key: 'login_gaz',          label: 'Identifiant',         sensitive: true, placeholder: 'email' },
+        { key: 'password_gaz',       label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'lien_direct_gaz',    label: 'Lien gaz (interne)',  placeholder: '' },
       ]
     },
     'charges-operateur': {
       label: 'Operateur Tel / Internet', groupLabel: 'Mes charges',
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 4a2 2 0 0 1 2-2h4',
+      lienSections: [
+        { key: 'tel', label: 'Operateur telephone',  formKey: 'lien_direct' },
+        { key: 'net', label: 'Operateur internet',   formKey: 'lien_direct_net' },
+      ],
       fields: [
-        { key: 'sep_tel', label: 'TELEPHONE', type: 'separator' },
-        { key: 'operateur_tel',        label: 'Operateur',           placeholder: 'SFR, Orange...' },
-        { key: 'numero_ligne',         label: 'Numero de ligne',     placeholder: '06 XX XX XX XX' },
-        { key: 'forfait_tel',          label: 'Forfait',             placeholder: '100Go 5G' },
-        { key: 'montant_tel',          label: 'Montant mensuel (€)', placeholder: '20', type: 'number' },
-        { key: 'fin_engagement_tel',   label: 'Fin engagement',      type: 'date' },
-        { key: 'login_tel',            label: 'Identifiant',         sensitive: true, placeholder: 'email' },
-        { key: 'password_tel',         label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
-        { key: 'sep_internet', label: 'INTERNET / FIBRE', type: 'separator' },
-        { key: 'operateur_net',        label: 'Operateur',           placeholder: 'Free, Orange...' },
-        { key: 'debit',                label: 'Debit',               placeholder: '1 Gb/s' },
-        { key: 'montant_net',          label: 'Montant mensuel (€)', placeholder: '30', type: 'number' },
-        { key: 'fin_engagement_net',   label: 'Fin engagement',      type: 'date' },
-        { key: 'login_net',            label: 'Identifiant',         sensitive: true, placeholder: 'email' },
-        { key: 'password_net',         label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_tel',           label: 'TELEPHONE',           type: 'separator' },
+        { key: 'operateur_tel',     label: 'Operateur',           placeholder: 'SFR, Orange...' },
+        { key: 'numero_ligne',      label: 'Numero de ligne',     placeholder: '06 XX XX XX XX' },
+        { key: 'forfait_tel',       label: 'Forfait',             placeholder: '100Go 5G' },
+        { key: 'montant_tel',       label: 'Montant mensuel (€)', placeholder: '20', type: 'number' },
+        { key: 'fin_engagement_tel',label: 'Fin engagement',      type: 'date' },
+        { key: 'login_tel',         label: 'Identifiant',         sensitive: true, placeholder: 'email' },
+        { key: 'password_tel',      label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'sep_net',           label: 'INTERNET / FIBRE',    type: 'separator' },
+        { key: 'operateur_net',     label: 'Operateur',           placeholder: 'Free, Orange...' },
+        { key: 'debit',             label: 'Debit',               placeholder: '1 Gb/s' },
+        { key: 'montant_net',       label: 'Montant mensuel (€)', placeholder: '30', type: 'number' },
+        { key: 'fin_engagement_net',label: 'Fin engagement',      type: 'date' },
+        { key: 'login_net',         label: 'Identifiant',         sensitive: true, placeholder: 'email' },
+        { key: 'password_net',      label: 'Mot de passe',        sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'lien_direct_net',   label: 'Lien internet (interne)', placeholder: '' },
       ]
     },
     'charges-impots': {
@@ -476,15 +481,19 @@ function getModuleConfig(groupeId, moduleId) {
       label: 'Maison / Vehicule', groupLabel: 'Assurances',
       color: '#D85A30', bgLight: '#FAECE7',
       icon: 'M1 3h15v13H1zM16 8h4l3 5v3h-7V8zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+      lienSections: [
+        { key: 'maison',   label: 'Assureur maison',   formKey: 'lien_direct' },
+        { key: 'vehicule', label: 'Assureur vehicule', formKey: 'lien_direct_vehicule' },
+      ],
       fields: [
-        { key: 'sep_maison', label: 'MAISON', type: 'separator' },
+        { key: 'sep_maison',         label: 'MAISON',             type: 'separator' },
         { key: 'assureur_maison',    label: 'Assureur',           placeholder: 'AXA, MAIF...' },
         { key: 'numero_police_mais', label: 'Numero de police',   placeholder: '123456789' },
         { key: 'prime_maison',       label: 'Prime annuelle (€)', placeholder: '300', type: 'number' },
         { key: 'echeance_maison',    label: 'Echeance',           type: 'date' },
         { key: 'login_maison',       label: 'Identifiant',        sensitive: true, placeholder: 'email' },
         { key: 'password_maison',    label: 'Mot de passe',       sensitive: true, type: 'password', placeholder: '••••••••' },
-        { key: 'sep_vehicule', label: 'VEHICULE', type: 'separator' },
+        { key: 'sep_vehicule',       label: 'VEHICULE',           type: 'separator' },
         { key: 'assureur_vehicule',  label: 'Assureur',           placeholder: 'AXA, MACIF...' },
         { key: 'immatriculation',    label: 'Immatriculation',    placeholder: 'XX-000-XX' },
         { key: 'numero_police_veh',  label: 'Numero de police',   placeholder: '123456789' },
@@ -492,6 +501,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'echeance_vehicule',  label: 'Echeance',           type: 'date' },
         { key: 'login_vehicule',     label: 'Identifiant',        sensitive: true, placeholder: 'email' },
         { key: 'password_vehicule',  label: 'Mot de passe',       sensitive: true, type: 'password', placeholder: '••••••••' },
+        { key: 'lien_direct_vehicule', label: 'Lien vehicule (interne)', placeholder: '' },
       ]
     },
     'documents-identite': {
@@ -499,13 +509,13 @@ function getModuleConfig(groupeId, moduleId) {
       color: '#5F5E5A', bgLight: '#F1EFE8',
       icon: 'M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM8 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm8-4h4m-4 4h2',
       fields: [
-        { key: 'sep_cni', label: 'CARTE NATIONALE D IDENTITE', type: 'separator' },
+        { key: 'sep_cni',              label: 'CARTE NATIONALE D IDENTITE', type: 'separator' },
         { key: 'cni_numero',           label: 'Numero',     placeholder: 'XXXXXXXXX' },
         { key: 'cni_expiration',       label: 'Expiration', type: 'date' },
-        { key: 'sep_passeport', label: 'PASSEPORT', type: 'separator' },
+        { key: 'sep_passeport',        label: 'PASSEPORT',  type: 'separator' },
         { key: 'passeport_numero',     label: 'Numero',     placeholder: 'XX0000000' },
         { key: 'passeport_expiration', label: 'Expiration', type: 'date' },
-        { key: 'sep_permis', label: 'PERMIS DE CONDUIRE', type: 'separator' },
+        { key: 'sep_permis',           label: 'PERMIS DE CONDUIRE', type: 'separator' },
         { key: 'permis_numero',        label: 'Numero',     placeholder: 'XXXXXXXXX' },
         { key: 'permis_expiration',    label: 'Expiration', type: 'date' },
       ]
@@ -658,7 +668,7 @@ const s = {
   title: { fontSize: '15px', fontWeight: '700', color: '#1a1510' },
   editBtn: { background: 'none', border: 'none', fontSize: '16px',
     cursor: 'pointer', padding: '4px 8px' },
-  accessCard: { margin: '12px 14px 0', background: 'white', borderRadius: '14px',
+  accessCard: { margin: '10px 14px 0', background: 'white', borderRadius: '14px',
     padding: '12px 14px', display: 'flex', alignItems: 'center',
     justifyContent: 'space-between', border: '1.5px solid',
     boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
@@ -667,8 +677,9 @@ const s = {
     display: 'flex', alignItems: 'center', justifyContent: 'center' },
   accessTitle: { fontSize: '12px', fontWeight: '600', color: '#1a1510' },
   accessUrl: { fontSize: '10px', color: '#bbb', marginTop: '1px' },
-  accessBtn: { padding: '7px 14px', borderRadius: '10px', border: 'none',
-    color: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer' },
+  accessBtn: { padding: '7px 12px', borderRadius: '10px', border: 'none',
+    color: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+    minWidth: '90px', textAlign: 'center' },
   viewWrap: { padding: '12px 14px' },
   empty: { textAlign: 'center', padding: '40px 24px' },
   emptyTitle: { fontSize: '16px', fontWeight: '600', color: '#1a1510', marginBottom: '6px' },
