@@ -133,59 +133,24 @@ export default function App() {
       }
     })
 
-    // Verrouillage automatique avec timestamp
-    const handleVisibilityChange = () => {
-      const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
-      const pinCode = localStorage.getItem('mindesk_pin')
-      if (!pinActive || !pinCode) return
+    // Sauvegarde le timestamp toutes les 5 secondes
+    const interval = setInterval(() => {
+      localStorage.setItem('mindesk_last_seen', Date.now().toString())
+    }, 5000)
 
-      if (document.visibilityState === 'hidden') {
-        localStorage.setItem('mindesk_locked_at', Date.now().toString())
-      } else if (document.visibilityState === 'visible') {
-        const lockedAt = localStorage.getItem('mindesk_locked_at')
-        if (lockedAt) {
-          const elapsed = Date.now() - parseInt(lockedAt)
-          if (elapsed > 10000) {
-            setLocked(true)
-            setUnlockedBy(null)
-          }
-          localStorage.removeItem('mindesk_locked_at')
-        }
+    // Au lancement, vérifie si l'app était fermée depuis longtemps
+    const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
+    const pinCode = localStorage.getItem('mindesk_pin')
+    const lastSeen = localStorage.getItem('mindesk_last_seen')
+    if (pinActive && pinCode && lastSeen) {
+      const elapsed = Date.now() - parseInt(lastSeen)
+      if (elapsed > 30000) {
+        setLocked(true)
+        setUnlockedBy(null)
       }
     }
 
-    const handlePageHide = () => {
-      const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
-      const pinCode = localStorage.getItem('mindesk_pin')
-      if (pinActive && pinCode) {
-        localStorage.setItem('mindesk_locked_at', Date.now().toString())
-      }
-    }
-
-    const handlePageShow = () => {
-      const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
-      const pinCode = localStorage.getItem('mindesk_pin')
-      if (!pinActive || !pinCode) return
-      const lockedAt = localStorage.getItem('mindesk_locked_at')
-      if (lockedAt) {
-        const elapsed = Date.now() - parseInt(lockedAt)
-        if (elapsed > 10000) {
-          setLocked(true)
-          setUnlockedBy(null)
-        }
-        localStorage.removeItem('mindesk_locked_at')
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('pagehide', handlePageHide)
-    window.addEventListener('pageshow', handlePageShow)
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('pagehide', handlePageHide)
-      window.removeEventListener('pageshow', handlePageShow)
-    }
+    return () => clearInterval(interval)
   }, [])
 
   if (loading) return (
