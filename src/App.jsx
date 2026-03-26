@@ -41,10 +41,8 @@ function PinLock({ onSuccess }) {
           {localStorage.getItem('mindesk_email')}
         </div>
       </div>
-
       <div style={s.pinTitle}>Entre ton code PIN</div>
       {error && <div style={s.error}>{error}</div>}
-
       <div style={s.dots}>
         {[0,1,2,3].map(i => (
           <div key={i} style={{
@@ -53,7 +51,6 @@ function PinLock({ onSuccess }) {
           }} />
         ))}
       </div>
-
       <div style={s.keypad}>
         {[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map((k, i) => (
           <button key={i}
@@ -92,6 +89,7 @@ export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [locked, setLocked] = useState(true)
+  const [unlockedBy, setUnlockedBy] = useState(null)
 
   const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
   const pinCode = localStorage.getItem('mindesk_pin')
@@ -101,9 +99,17 @@ export default function App() {
       setSession(session)
       setLoading(false)
     })
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
-      if (!session) setLocked(true)
+      if (!session) {
+        setLocked(true)
+        setUnlockedBy(null)
+      }
+      // Si nouvelle connexion depuis Login (email ou bio) → pas de PIN lock
+      if (event === 'SIGNED_IN' && locked) {
+        setUnlockedBy('login')
+        setLocked(false)
+      }
     })
   }, [])
 
@@ -120,7 +126,8 @@ export default function App() {
     </div>
   )
 
-  if (session && pinActive && pinCode && locked) {
+  // Session active + PIN + verrouillé + pas déverrouillé par login
+  if (session && pinActive && pinCode && locked && unlockedBy !== 'login') {
     return (
       <BrowserRouter>
         <PinLock onSuccess={() => setLocked(false)} />
@@ -139,9 +146,9 @@ export default function App() {
         <Route path="/capture" element={session ? <Capture session={session} /> : <Navigate to="/" />} />
         <Route path="/galerie" element={session ? <Galerie session={session} /> : <Navigate to="/" />} />
         <Route path="/setup-pin" element={session ? <SetupPin /> : <Navigate to="/" />} />
+        <Route path="/setup-biometric" element={session ? <SetupBiometric session={session} /> : <Navigate to="/" />} />
         <Route path="/register" element={session ? <Navigate to="/" /> : <Register />} />
         <Route path="*" element={<Navigate to="/" />} />
-        <Route path="/setup-biometric" element={session ? <SetupBiometric session={session} /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   )
