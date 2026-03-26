@@ -5,11 +5,11 @@ export default function BottomNav() {
   const location = useLocation()
 
   const items = [
-    { path: '/',        icon: '🏠', label: 'Accueil'  },
-    { path: '/galerie', icon: '📸', label: 'Captures' },
-    { path: '/search',  icon: '🔍', label: 'Chercher' },
-    { path: '/profil',  icon: '👤', label: 'Profil'   },
-  ]
+  { path: '/',             icon: '🏠', label: 'Accueil'      },
+  { path: '/galerie',      icon: '📸', label: 'Captures'     },
+  { path: '/portefeuille', icon: '💳', label: 'Portefeuille' },
+  { path: '/profil',       icon: '👤', label: 'Profil'       },
+]
 
   return (
     <div style={styles.nav}>

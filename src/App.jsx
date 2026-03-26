@@ -8,6 +8,7 @@ import Capture from './pages/Capture'
 import Galerie from './pages/Galerie'
 import SetupPin from './pages/SetupPin'
 import SetupBiometric from './pages/SetupBiometric'
+import Portefeuille from './pages/Portefeuille'
 
 function PinLock({ onSuccess }) {
   const [pin, setPin] = useState('')
@@ -149,6 +150,7 @@ export default function App() {
         <Route path="/setup-biometric" element={session ? <SetupBiometric session={session} /> : <Navigate to="/" />} />
         <Route path="/register" element={session ? <Navigate to="/" /> : <Register />} />
         <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/portefeuille" element={session ? <Portefeuille session={session} /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   )
