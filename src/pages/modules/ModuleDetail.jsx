@@ -211,7 +211,7 @@ export default function ModuleDetail({ session }) {
             </div>
           ) : (
             <div style={s.fields}>
-              {config.fields.filter(f => !f.sensitive && f.type !== 'separator').map((f, i, arr) => (
+              {config.fields.filter(f => !f.sensitive && f.type !== 'separator' && data.champs?.[f.key]).map((f, i, arr) => (
                 <div key={f.key} style={{...s.fieldRow,
                   borderBottom: i < arr.length-1 ? '1px solid rgba(0,0,0,0.05)' : 'none'}}>
                   <div style={s.fieldLabel}>{f.label}</div>
