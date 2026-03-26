@@ -81,26 +81,26 @@ export default function Home({ session, onLock }) {
         ))}
 
         {/* ACTIONS */}
-        <div style={s.actionsWrap}>
-          {!pinActive && (
-            <button onClick={() => navigate('/setup-pin')} style={{...s.actionBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
-              🔐 Activer le code PIN
-            </button>
-          )}
-          {!pinActive && window.innerWidth < 768 && (
-            <button onClick={() => onLock()} style={{...s.actionBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
-              🔒 Verrouiller
-            </button>
-          )}
-          {!bioActive && window.innerWidth < 768 && (
-            <button onClick={() => navigate('/setup-biometric')} style={{...s.actionBtn, color: '#1D9E75', borderColor: 'rgba(29,158,117,0.2)'}}>
-              👆 Activer l empreinte
-            </button>
-          )}
-          <button onClick={handleLogout} style={s.actionBtn}>
-            Deconnexion complete
-          </button>
-        </div>
+<div style={s.actionsWrap}>
+  {!pinActive && window.innerWidth < 768 && (
+    <button onClick={() => navigate('/setup-pin')} style={{...s.actionBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+      🔐 Activer le code PIN
+    </button>
+  )}
+  {pinActive && window.innerWidth < 768 && (
+    <button onClick={() => onLock()} style={{...s.actionBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+      🔒 Verrouiller
+    </button>
+  )}
+  {!bioActive && window.innerWidth < 768 && (
+    <button onClick={() => navigate('/setup-biometric')} style={{...s.actionBtn, color: '#1D9E75', borderColor: 'rgba(29,158,117,0.2)'}}>
+      👆 Activer l empreinte
+    </button>
+  )}
+  <button onClick={handleLogout} style={s.actionBtn}>
+    Deconnexion complete
+  </button>
+</div>
 
       </div>
 
