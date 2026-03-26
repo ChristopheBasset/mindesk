@@ -132,6 +132,23 @@ export default function App() {
         setLocked(false)
       }
     })
+
+    // Verrouillage automatique quand l'app passe en arriere-plan
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
+        const pinCode = localStorage.getItem('mindesk_pin')
+        if (pinActive && pinCode) {
+          setLocked(true)
+          setUnlockedBy(null)
+        }
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [])
 
   if (loading) return (
