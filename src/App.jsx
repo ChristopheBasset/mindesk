@@ -14,6 +14,9 @@ import ModuleList from './pages/modules/ModuleList'
 import { LIST_MODULE_KEYS } from './pages/modules/ModuleList'
 import ResetPassword from './pages/ResetPassword'
 
+// Détection immédiate du recovery au chargement
+const isRecoveryLink = window.location.hash.includes('type=recovery')
+
 function ModuleRouter({ session }) {
   const { groupeId, moduleId } = useParams()
   const key = `${groupeId}-${moduleId}`
@@ -104,38 +107,32 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [locked, setLocked] = useState(true)
   const [unlockedBy, setUnlockedBy] = useState(null)
-  const [passwordRecovery, setPasswordRecovery] = useState(false)
+  const [passwordRecovery, setPasswordRecovery] = useState(isRecoveryLink)
 
   const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
   const pinCode = localStorage.getItem('mindesk_pin')
 
   useEffect(() => {
-  // Détecte si c'est un lien de recovery
-  const hash = window.location.hash
-  if (hash.includes('type=recovery')) {
-    setPasswordRecovery(true)
-  }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setLoading(false)
+    })
 
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setSession(session)
-    setLoading(false)
-  })
-
-  supabase.auth.onAuthStateChange((event, session) => {
-    setSession(session)
-    if (event === 'PASSWORD_RECOVERY') {
-      setPasswordRecovery(true)
-    }
-    if (!session) {
-      setLocked(true)
-      setUnlockedBy(null)
-    }
-    if (event === 'SIGNED_IN' && locked) {
-      setUnlockedBy('login')
-      setLocked(false)
-    }
-  })
-}, [])
+    supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session)
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecovery(true)
+      }
+      if (!session) {
+        setLocked(true)
+        setUnlockedBy(null)
+      }
+      if (event === 'SIGNED_IN' && locked) {
+        setUnlockedBy('login')
+        setLocked(false)
+      }
+    })
+  }, [])
 
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center',
@@ -151,7 +148,10 @@ export default function App() {
   )
 
   if (passwordRecovery) {
-    return <ResetPassword onDone={() => setPasswordRecovery(false)} />
+    return <ResetPassword onDone={() => {
+      setPasswordRecovery(false)
+      window.location.hash = ''
+    }} />
   }
 
   if (session && pinActive && pinCode && locked && unlockedBy !== 'login') {
