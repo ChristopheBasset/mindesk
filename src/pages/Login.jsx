@@ -238,3 +238,6 @@ const s = {
     color: '#1a1510', cursor: 'pointer',
     boxShadow: '0 1px 4px rgba(0,0,0,0.08)' },
   keyEmpty: { background: 'transparent', boxS
+    altBtn: { background: 'none', border: 'none', color: '#bbb',
+    fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' },
+}
