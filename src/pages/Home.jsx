@@ -142,12 +142,32 @@ export default function Home({ session, onLock }) {
   </div>
 )}
 
+{!pinActive && (
+  <div style={s.logoutWrap}>
+    <button
+      onClick={() => navigate('/setup-pin')}
+      style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+      🔐 Activer le code PIN
+    </button>
+  </div>
+)}
+
 {pinActive && (
   <div style={s.logoutWrap}>
     <button
       onClick={() => onLock()}
       style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
       🔒 Verrouiller
+    </button>
+  </div>
+)}
+
+{!localStorage.getItem('mindesk_biometric_active') && (
+  <div style={s.logoutWrap}>
+    <button
+      onClick={() => navigate('/setup-biometric')}
+      style={{...s.logoutBtn, color: '#1D9E75', borderColor: 'rgba(29,158,117,0.2)'}}>
+      👆 Activer l empreinte digitale
     </button>
   </div>
 )}
