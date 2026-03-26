@@ -7,6 +7,7 @@ export default function Home({ session, onLock }) {
   const navigate = useNavigate()
   const [captures, setCaptures] = useState([])
   const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
+  const bioActive = localStorage.getItem('mindesk_biometric_active') === 'true'
 
   useEffect(() => { loadCaptures() }, [])
 
@@ -40,7 +41,9 @@ export default function Home({ session, onLock }) {
 
       <div style={s.aiBar}>
         <div style={s.aiDot} />
-        <span style={s.aiHint}><strong style={s.aiStrong}>Que fais-je pour toi ?</strong> — parle ou ecris...</span>
+        <span style={s.aiHint}>
+          <strong style={s.aiStrong}>Que fais-je pour toi ?</strong> — parle ou ecris...
+        </span>
       </div>
 
       <div style={s.sec}>Capture rapide</div>
@@ -81,10 +84,13 @@ export default function Home({ session, onLock }) {
         </div>
       </div>
 
+      {/* MODULES — chaque carte navigue vers son path si défini */}
       <div style={s.sec}>Modules</div>
       <div style={s.grid}>
         {modules.map(m => (
-          <div key={m.title} style={s.mcard}>
+          <div key={m.title}
+            style={{...s.mcard, cursor: m.path ? 'pointer' : 'default'}}
+            onClick={() => m.path && navigate(m.path)}>
             <div style={{...s.mstripe, background: m.color}} />
             <span style={s.micon}>{m.icon}</span>
             <div style={s.mtitle}>{m.title}</div>
@@ -132,51 +138,42 @@ export default function Home({ session, onLock }) {
         </>
       )}
 
+      {/* BOUTONS DU BAS — un seul bloc propre */}
       {!pinActive && (
-  <div style={s.logoutWrap}>
-    <button
-      onClick={() => navigate('/setup-pin')}
-      style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
-      🔐 Activer le code PIN
-    </button>
-  </div>
-)}
+        <div style={s.logoutWrap}>
+          <button
+            onClick={() => navigate('/setup-pin')}
+            style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+            🔐 Activer le code PIN
+          </button>
+        </div>
+      )}
 
-{!pinActive && (
-  <div style={s.logoutWrap}>
-    <button
-      onClick={() => navigate('/setup-pin')}
-      style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
-      🔐 Activer le code PIN
-    </button>
-  </div>
-)}
+      {pinActive && (
+        <div style={s.logoutWrap}>
+          <button
+            onClick={() => onLock()}
+            style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
+            🔒 Verrouiller
+          </button>
+        </div>
+      )}
 
-{pinActive && (
-  <div style={s.logoutWrap}>
-    <button
-      onClick={() => onLock()}
-      style={{...s.logoutBtn, color: '#534AB7', borderColor: 'rgba(83,74,183,0.2)'}}>
-      🔒 Verrouiller
-    </button>
-  </div>
-)}
+      {!bioActive && (
+        <div style={s.logoutWrap}>
+          <button
+            onClick={() => navigate('/setup-biometric')}
+            style={{...s.logoutBtn, color: '#1D9E75', borderColor: 'rgba(29,158,117,0.2)'}}>
+            👆 Activer l empreinte digitale
+          </button>
+        </div>
+      )}
 
-{!localStorage.getItem('mindesk_biometric_active') && (
-  <div style={s.logoutWrap}>
-    <button
-      onClick={() => navigate('/setup-biometric')}
-      style={{...s.logoutBtn, color: '#1D9E75', borderColor: 'rgba(29,158,117,0.2)'}}>
-      👆 Activer l empreinte digitale
-    </button>
-  </div>
-)}
-
-<div style={s.logoutWrap}>
-  <button onClick={handleLogout} style={s.logoutBtn}>
-    Deconnexion complete
-  </button>
-</div>
+      <div style={s.logoutWrap}>
+        <button onClick={handleLogout} style={s.logoutBtn}>
+          Deconnexion complete
+        </button>
+      </div>
 
       <BottomNav />
     </div>
@@ -190,13 +187,14 @@ const services = [
   { icon: '📰', label: 'Medias', bg: '#FAEEDA' },
 ]
 
+// path: null = pas encore développé, path: '/xxx' = cliquable
 const modules = [
-  { icon: '📋', title: 'Taches',       sub: '0 en attente',  color: '#534AB7', badgeBg: '#EEEDFE' },
-  { icon: '📸', title: 'Souvenirs',    sub: '0 captures',    color: '#D85A30', badgeBg: '#FAECE7' },
-  { icon: '📅', title: 'Agenda',       sub: 'Aucun RDV',     color: '#1D9E75', badgeBg: '#E1F5EE' },
-  { icon: '💡', title: 'Idees',        sub: '0 idees',       color: '#7F77DD', badgeBg: '#EEEDFE' },
-  { icon: '💳', title: 'Portefeuille', sub: '0 cartes',      color: '#BA7517', badgeBg: '#FAEEDA' },
-  { icon: '🔔', title: 'Alertes',      sub: 'Aucune alerte', color: '#E24B4A', badgeBg: '#FCEBEB' },
+  { icon: '📋', title: 'Taches',       sub: '0 en attente',  color: '#534AB7', badgeBg: '#EEEDFE', path: null },
+  { icon: '📸', title: 'Souvenirs',    sub: '0 captures',    color: '#D85A30', badgeBg: '#FAECE7', path: '/galerie' },
+  { icon: '📅', title: 'Agenda',       sub: 'Aucun RDV',     color: '#1D9E75', badgeBg: '#E1F5EE', path: null },
+  { icon: '💡', title: 'Idees',        sub: '0 idees',       color: '#7F77DD', badgeBg: '#EEEDFE', path: '/galerie' },
+  { icon: '💳', title: 'Portefeuille', sub: '0 cartes',      color: '#BA7517', badgeBg: '#FAEEDA', path: '/portefeuille' },
+  { icon: '🔔', title: 'Alertes',      sub: 'Aucune alerte', color: '#E24B4A', badgeBg: '#FCEBEB', path: null },
 ]
 
 const s = {
