@@ -145,7 +145,7 @@ export default function App() {
         const lockedAt = localStorage.getItem('mindesk_locked_at')
         if (lockedAt) {
           const elapsed = Date.now() - parseInt(lockedAt)
-          if (elapsed > 30000) {
+          if (elapsed > 10000) {
             setLocked(true)
             setUnlockedBy(null)
           }
@@ -153,10 +153,38 @@ export default function App() {
         }
       }
     }
+
+    const handlePageHide = () => {
+      const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
+      const pinCode = localStorage.getItem('mindesk_pin')
+      if (pinActive && pinCode) {
+        localStorage.setItem('mindesk_locked_at', Date.now().toString())
+      }
+    }
+
+    const handlePageShow = () => {
+      const pinActive = localStorage.getItem('mindesk_pin_active') === 'true'
+      const pinCode = localStorage.getItem('mindesk_pin')
+      if (!pinActive || !pinCode) return
+      const lockedAt = localStorage.getItem('mindesk_locked_at')
+      if (lockedAt) {
+        const elapsed = Date.now() - parseInt(lockedAt)
+        if (elapsed > 10000) {
+          setLocked(true)
+          setUnlockedBy(null)
+        }
+        localStorage.removeItem('mindesk_locked_at')
+      }
+    }
+
     document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('pagehide', handlePageHide)
+    window.addEventListener('pageshow', handlePageShow)
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('pagehide', handlePageHide)
+      window.removeEventListener('pageshow', handlePageShow)
     }
   }, [])
 
