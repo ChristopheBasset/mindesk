@@ -88,17 +88,13 @@ export default function ModuleDetail({ session }) {
   useEffect(() => { loadData() }, [])
 
   const loadData = async () => {
-  try {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('modules_data')
       .select('*')
       .eq('user_id', session.user.id)
       .eq('groupe', groupeId)
       .eq('module', moduleId)
-      .maybeSingle()
-
-    if (error) console.error('Supabase error:', error)
-
+      .single()
     if (data) {
       setData(data)
       setForm({
@@ -107,12 +103,8 @@ export default function ModuleDetail({ session }) {
         lien_direct: data.lien_direct || '',
       })
     }
-  } catch(e) {
-    console.error('loadData error:', e)
-  } finally {
-    setLoading(false)  // ← toujours exécuté même en cas d'erreur
+    setLoading(false)
   }
-}
 
   const handleSave = async () => {
     setSaving(true)
@@ -360,7 +352,7 @@ function buildAccesDirect(groupeId, moduleId, data, config) {
   const c = data.champs || {}
   const cr = data.credentials || {}
 
-  if (groupeId === 'charges' && moduleId === 'energie') {
+  if (groupeId === 'charges' && moduleId === 'electricite-gaz') {
     const list = []
     if (data.lien_direct) list.push({
       key: 'elec', label: c.fournisseur_elec || 'Electricite',
@@ -390,7 +382,7 @@ function buildAccesDirect(groupeId, moduleId, data, config) {
     return list
   }
 
-  if (groupeId === 'assurances' && moduleId === 'biens') {
+  if (groupeId === 'assurances' && moduleId === 'maison-vehicule') {
     const list = []
     if (data.lien_direct) list.push({
       key: 'maison', label: c.assureur_maison || 'Maison',
@@ -416,7 +408,7 @@ function buildAccesDirect(groupeId, moduleId, data, config) {
 
 function getModuleConfig(groupeId, moduleId) {
   const configs = {
-    'charges-energie': {
+    'charges-electricite-gaz': {
       label: 'Electricite / Gaz', groupLabel: 'Mes charges',
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
@@ -443,6 +435,7 @@ function getModuleConfig(groupeId, moduleId) {
     },
     'charges-operateur': {
       label: 'Operateur Tel / Internet', groupLabel: 'Mes charges',
+
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 4a2 2 0 0 1 2-2h4',
       lienSections: [
@@ -505,7 +498,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'password',            label: 'Mot de passe',             sensitive: true, type: 'password', placeholder: '••••••••' },
       ]
     },
-    'assurances-biens': {
+    'assurances-maison-vehicule': {
       label: 'Maison / Vehicule', groupLabel: 'Assurances',
       color: '#D85A30', bgLight: '#FAECE7',
       icon: 'M1 3h15v13H1zM16 8h4l3 5v3h-7V8zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
@@ -548,7 +541,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'permis_expiration',    label: 'Expiration', type: 'date' },
       ]
     },
-    'documents-fidelite': {
+    'documents-cartes-fidelite': {
       label: 'Cartes fidelite', groupLabel: 'Documents',
       color: '#5F5E5A', bgLight: '#F1EFE8',
       icon: 'M2 5h20v14H2zM2 10h20',
@@ -558,7 +551,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'points',   label: 'Points / Solde',placeholder: '250 points' },
       ]
     },
-    'documents-justifs': {
+    'documents-justificatifs': {
       label: 'Justificatifs', groupLabel: 'Documents',
       color: '#5F5E5A', bgLight: '#F1EFE8',
       icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6',
@@ -624,7 +617,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'tags',    label: 'Tags',    placeholder: 'pro, perso...' },
       ]
     },
-    'organisation-rappels': {
+    'organisation-a-ne-pas-oublier': {
       label: 'A ne pas oublier', groupLabel: 'Organisation',
       color: '#BA7517', bgLight: '#FAEEDA',
       icon: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
