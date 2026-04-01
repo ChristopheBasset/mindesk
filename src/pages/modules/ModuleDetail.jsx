@@ -754,6 +754,7 @@ const s = {
     fontWeight: '600', cursor: 'pointer', display: 'flex',
     alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' },
   fcFlag: { fontSize: '12px' },
+  saveBtn: { width: '100%', padding: '12px', borderRadius: '12px',
     border: 'none', color: 'white', fontSize: '14px',
     fontWeight: '600', cursor: 'pointer', marginTop: '4px' },
 }
