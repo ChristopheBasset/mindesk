@@ -13,6 +13,7 @@ import ModuleDetail from './pages/modules/ModuleDetail'
 import ModuleList from './pages/modules/ModuleList'
 import { LIST_MODULE_KEYS } from './pages/modules/ModuleList'
 import ResetPassword from './pages/ResetPassword'
+import VoiceButton from './components/VoiceButton'
 
 // Détection immédiate du recovery au chargement
 const isRecoveryLink = window.location.hash.includes('type=recovery')
@@ -200,6 +201,10 @@ export default function App() {
         <Route path="/register" element={session ? <Navigate to="/" /> : <Register />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+
+      {/* Commande vocale */}
+      {session && <VoiceButton />}
+
     </BrowserRouter>
   )
 }
