@@ -73,6 +73,11 @@ const LIENS_PREDEFINIS = {
   ],
 }
 
+const FRANCE_CONNECT = {
+  'charges-impots':  'https://cfspart.impots.gouv.fr/LoginMDP',
+  'assurances-secu': 'https://assure.ameli.fr/PortailAS/appmanager/PortailAS/assure?_nfpb=true&_pageLabel=as_connexion_page',
+}
+
 export default function ModuleDetail({ session }) {
   const navigate = useNavigate()
   const { groupeId, moduleId } = useParams()
@@ -191,12 +196,21 @@ export default function ModuleDetail({ session }) {
               <div style={s.accessUrl}>{a.url.replace('https://', '').split('/')[0]}</div>
             </div>
           </div>
-          <button
-            onClick={() => handleOpenLink(a.url, a.pwdKey)}
-            style={{...s.accessBtn, background: config.color,
-              fontSize: copiedKey === a.pwdKey ? '10px' : '12px'}}>
-            {copiedKey === a.pwdKey ? '✓ MDP copie !' : 'Ouvrir →'}
-          </button>
+          <div style={{display:'flex', flexDirection:'column', gap:'6px', alignItems:'flex-end'}}>
+            <button
+              onClick={() => handleOpenLink(a.url, a.pwdKey)}
+              style={{...s.accessBtn, background: config.color,
+                fontSize: copiedKey === a.pwdKey ? '10px' : '12px'}}>
+              {copiedKey === a.pwdKey ? '✓ MDP copie !' : 'Ouvrir →'}
+            </button>
+            {FRANCE_CONNECT[`${groupeId}-${moduleId}`] && (
+              <button
+                onClick={() => window.open(FRANCE_CONNECT[`${groupeId}-${moduleId}`], '_blank')}
+                style={s.fcBtn}>
+                <span style={s.fcFlag}>🇫🇷</span> FranceConnect
+              </button>
+            )}
+          </div>
         </div>
       ))}
 
@@ -352,7 +366,7 @@ function buildAccesDirect(groupeId, moduleId, data, config) {
   const c = data.champs || {}
   const cr = data.credentials || {}
 
-  if (groupeId === 'charges' && moduleId === 'electricite-gaz') {
+  if (groupeId === 'charges' && moduleId === 'energie') {
     const list = []
     if (data.lien_direct) list.push({
       key: 'elec', label: c.fournisseur_elec || 'Electricite',
@@ -382,7 +396,7 @@ function buildAccesDirect(groupeId, moduleId, data, config) {
     return list
   }
 
-  if (groupeId === 'assurances' && moduleId === 'maison-vehicule') {
+  if (groupeId === 'assurances' && moduleId === 'biens') {
     const list = []
     if (data.lien_direct) list.push({
       key: 'maison', label: c.assureur_maison || 'Maison',
@@ -408,7 +422,7 @@ function buildAccesDirect(groupeId, moduleId, data, config) {
 
 function getModuleConfig(groupeId, moduleId) {
   const configs = {
-    'charges-electricite-gaz': {
+    'charges-energie': {
       label: 'Electricite / Gaz', groupLabel: 'Mes charges',
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
@@ -435,7 +449,6 @@ function getModuleConfig(groupeId, moduleId) {
     },
     'charges-operateur': {
       label: 'Operateur Tel / Internet', groupLabel: 'Mes charges',
-
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 4a2 2 0 0 1 2-2h4',
       lienSections: [
@@ -498,7 +511,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'password',            label: 'Mot de passe',             sensitive: true, type: 'password', placeholder: '••••••••' },
       ]
     },
-    'assurances-maison-vehicule': {
+    'assurances-biens': {
       label: 'Maison / Vehicule', groupLabel: 'Assurances',
       color: '#D85A30', bgLight: '#FAECE7',
       icon: 'M1 3h15v13H1zM16 8h4l3 5v3h-7V8zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
@@ -541,7 +554,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'permis_expiration',    label: 'Expiration', type: 'date' },
       ]
     },
-    'documents-cartes-fidelite': {
+    'documents-fidelite': {
       label: 'Cartes fidelite', groupLabel: 'Documents',
       color: '#5F5E5A', bgLight: '#F1EFE8',
       icon: 'M2 5h20v14H2zM2 10h20',
@@ -551,7 +564,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'points',   label: 'Points / Solde',placeholder: '250 points' },
       ]
     },
-    'documents-justificatifs': {
+    'documents-justifs': {
       label: 'Justificatifs', groupLabel: 'Documents',
       color: '#5F5E5A', bgLight: '#F1EFE8',
       icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6',
@@ -617,7 +630,7 @@ function getModuleConfig(groupeId, moduleId) {
         { key: 'tags',    label: 'Tags',    placeholder: 'pro, perso...' },
       ]
     },
-    'organisation-a-ne-pas-oublier': {
+    'organisation-rappels': {
       label: 'A ne pas oublier', groupLabel: 'Organisation',
       color: '#BA7517', bgLight: '#FAEEDA',
       icon: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
@@ -736,7 +749,11 @@ const s = {
   presetRow: { display: 'flex', gap: '7px', flexWrap: 'wrap', marginBottom: '4px' },
   presetBtn: { padding: '6px 12px', borderRadius: '10px',
     fontSize: '12px', fontWeight: '500', cursor: 'pointer' },
-  saveBtn: { width: '100%', padding: '12px', borderRadius: '12px',
+  fcBtn: { padding: '5px 10px', borderRadius: '10px', border: 'none',
+    background: '#003189', color: 'white', fontSize: '11px',
+    fontWeight: '600', cursor: 'pointer', display: 'flex',
+    alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' },
+  fcFlag: { fontSize: '12px' },
     border: 'none', color: 'white', fontSize: '14px',
     fontWeight: '600', cursor: 'pointer', marginTop: '4px' },
 }
