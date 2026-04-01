@@ -94,7 +94,7 @@ export default function ModuleDetail({ session }) {
       .eq('user_id', session.user.id)
       .eq('groupe', groupeId)
       .eq('module', moduleId)
-      .single()
+      .maybesingle()
     if (data) {
       setData(data)
       setForm({
