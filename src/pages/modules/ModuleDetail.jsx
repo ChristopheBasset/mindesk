@@ -88,17 +88,17 @@ export default function ModuleDetail({ session }) {
   useEffect(() => { loadData() }, [])
 
   const loadData = async () => {
+  try {
     const { data, error } = await supabase
-  .from('modules_data')
-  .select('*')
-  .eq('user_id', session.user.id)
-  .eq('groupe', groupeId)
-  .eq('module', moduleId)
-  .maybeSingle()
+      .from('modules_data')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .eq('groupe', groupeId)
+      .eq('module', moduleId)
+      .maybeSingle()
 
-if (error) {
-  console.error('Erreur Supabase:', error)
-}
+    if (error) console.error('Supabase error:', error)
+
     if (data) {
       setData(data)
       setForm({
@@ -107,8 +107,12 @@ if (error) {
         lien_direct: data.lien_direct || '',
       })
     }
-    setLoading(false)
+  } catch(e) {
+    console.error('loadData error:', e)
+  } finally {
+    setLoading(false)  // ← toujours exécuté même en cas d'erreur
   }
+}
 
   const handleSave = async () => {
     setSaving(true)
