@@ -197,17 +197,18 @@ export default function ModuleDetail({ session }) {
             </div>
           </div>
           <div style={{display:'flex', flexDirection:'column', gap:'6px', alignItems:'flex-end'}}>
-            <button
-              onClick={() => handleOpenLink(a.url, a.pwdKey)}
-              style={{...s.accessBtn, background: config.color,
-                fontSize: copiedKey === a.pwdKey ? '10px' : '12px'}}>
-              {copiedKey === a.pwdKey ? '✓ MDP copie !' : 'Ouvrir →'}
-            </button>
-            {FRANCE_CONNECT[`${groupeId}-${moduleId}`] && (
+            {a.url === config.fcUrl ? (
               <button
-                onClick={() => window.open(FRANCE_CONNECT[`${groupeId}-${moduleId}`], '_blank')}
+                onClick={() => window.open(a.url, '_blank')}
                 style={s.fcBtn}>
                 <span style={s.fcFlag}>🇫🇷</span> FranceConnect
+              </button>
+            ) : (
+              <button
+                onClick={() => handleOpenLink(a.url, a.pwdKey)}
+                style={{...s.accessBtn, background: config.color,
+                  fontSize: copiedKey === a.pwdKey ? '10px' : '12px'}}>
+                {copiedKey === a.pwdKey ? '✓ MDP copie !' : 'Ouvrir →'}
               </button>
             )}
           </div>
@@ -321,27 +322,53 @@ export default function ModuleDetail({ session }) {
           {/* LIEN DIRECT SIMPLE (modules sans sous-sections) */}
           {!config.lienSections && (
             <div style={s.formField}>
+              <div style={s.formLabel}>🔗 Méthode de connexion</div>
+
+              {/* Presets standards (EDF, Orange...) */}
               {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`] && (
-                <>
-                  <div style={s.formLabel}>🔗 Choisir le service</div>
-                  <div style={{...s.presetRow, marginBottom:'8px'}}>
-                    {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`].map(p => (
-                      <button key={p.label}
-                        onClick={() => setForm({...form, lien_direct: p.url})}
-                        style={{...s.presetBtn,
-                          background: form.lien_direct === p.url ? config.color : 'white',
-                          color: form.lien_direct === p.url ? 'white' : '#555',
-                          border: form.lien_direct === p.url
-                            ? `1.5px solid ${config.color}`
-                            : '1.5px solid rgba(0,0,0,0.1)',
-                        }}>
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </>
+                <div style={{...s.presetRow, marginBottom:'8px'}}>
+                  {LIENS_PREDEFINIS[`${groupeId}-${moduleId}`].map(p => (
+                    <button key={p.label}
+                      onClick={() => setForm({...form, lien_direct: p.url})}
+                      style={{...s.presetBtn,
+                        background: form.lien_direct === p.url ? config.color : 'white',
+                        color: form.lien_direct === p.url ? 'white' : '#555',
+                        border: form.lien_direct === p.url
+                          ? `1.5px solid ${config.color}`
+                          : '1.5px solid rgba(0,0,0,0.1)',
+                      }}>
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
               )}
-              <div style={s.formLabel}>🔗 Lien direct</div>
+
+              {/* Bouton FranceConnect si disponible */}
+              {config.fcUrl && (
+                <div style={{...s.presetRow, marginBottom:'8px'}}>
+                  <button
+                    onClick={() => setForm({...form, lien_direct: config.fcUrl})}
+                    style={{...s.presetBtn,
+                      background: form.lien_direct === config.fcUrl ? '#003189' : 'white',
+                      color: form.lien_direct === config.fcUrl ? 'white' : '#003189',
+                      border: `1.5px solid #003189`,
+                    }}>
+                    🇫🇷 FranceConnect
+                  </button>
+                  <button
+                    onClick={() => setForm({...form, lien_direct: ''})}
+                    style={{...s.presetBtn,
+                      background: (form.lien_direct && form.lien_direct !== config.fcUrl) ? config.color : 'white',
+                      color: (form.lien_direct && form.lien_direct !== config.fcUrl) ? 'white' : '#555',
+                      border: (form.lien_direct && form.lien_direct !== config.fcUrl)
+                        ? `1.5px solid ${config.color}`
+                        : '1.5px solid rgba(0,0,0,0.1)',
+                    }}>
+                    Lien direct
+                  </button>
+                </div>
+              )}
+
               <input style={s.input} type="url" placeholder="https://..."
                 value={form.lien_direct || ''}
                 onChange={e => setForm({...form, lien_direct: e.target.value})} />
@@ -478,6 +505,7 @@ function getModuleConfig(groupeId, moduleId) {
       label: 'Impots', groupLabel: 'Mes charges',
       color: '#534AB7', bgLight: '#EEEDFE',
       icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',
+      fcUrl: 'https://cfspart.impots.gouv.fr/LoginMDP',
       fields: [
         { key: 'numero_fiscal',    label: 'Numero fiscal',             placeholder: '0 000 000 000 000' },
         { key: 'montant_mensuel',  label: 'Prelevement mensuel (€)',   placeholder: '150', type: 'number' },
@@ -490,6 +518,7 @@ function getModuleConfig(groupeId, moduleId) {
       label: 'Securite Sociale', groupLabel: 'Assurances',
       color: '#D85A30', bgLight: '#FAECE7',
       icon: 'M22 12h-4l-3 9L9 3l-3 9H2',
+      fcUrl: 'https://assure.ameli.fr/PortailAS/appmanager/PortailAS/assure?_nfpb=true&_pageLabel=as_connexion_page',
       fields: [
         { key: 'numero_secu',      label: 'Numero secu',         placeholder: '1 XX XX XX XXX XXX XX' },
         { key: 'caisse',           label: 'Caisse rattachement', placeholder: 'CPAM de...' },
