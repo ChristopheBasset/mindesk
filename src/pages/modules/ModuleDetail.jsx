@@ -88,13 +88,17 @@ export default function ModuleDetail({ session }) {
   useEffect(() => { loadData() }, [])
 
   const loadData = async () => {
-    const { data } = await supabase
-      .from('modules_data')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .eq('groupe', groupeId)
-      .eq('module', moduleId)
-      .maybesingle()
+    const { data, error } = await supabase
+  .from('modules_data')
+  .select('*')
+  .eq('user_id', session.user.id)
+  .eq('groupe', groupeId)
+  .eq('module', moduleId)
+  .maybeSingle()
+
+if (error) {
+  console.error('Erreur Supabase:', error)
+}
     if (data) {
       setData(data)
       setForm({
