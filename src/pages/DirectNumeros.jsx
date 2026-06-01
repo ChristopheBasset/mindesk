@@ -3,34 +3,57 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BottomNav from '../components/BottomNav'
 
+const THEMES = ['Santé', 'Impôts', 'Argent', 'Identité', 'Logement', 'Famille', 'Autres']
+
 export default function DirectNumeros({ session }) {
   const navigate = useNavigate()
   const [numeros, setNumeros] = useState([])
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState(null)
 
-  useEffect(() => {
-    let active = true
+  // état du formulaire d'ajout
+  const [showForm, setShowForm] = useState(false)
+  const [fLabel, setFLabel] = useState('')
+  const [fValue, setFValue] = useState('')
+  const [fTheme, setFTheme] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const charger = () => {
     supabase
       .from('identifiants')
       .select('*')
       .order('theme', { ascending: true })
       .order('label', { ascending: true })
       .then(({ data, error }) => {
-        if (!active) return
         if (!error && data) setNumeros(data)
         setLoading(false)
       })
-    return () => { active = false }
-  }, [])
+  }
+
+  useEffect(() => { charger() }, [])
 
   const copier = async (valeur, id) => {
     try {
       await navigator.clipboard.writeText(valeur)
       setCopiedId(id)
       setTimeout(() => setCopiedId(null), 1500)
-    } catch (e) {
-      // presse-papier indisponible (contexte non sécurisé) — on ignore
+    } catch (e) {}
+  }
+
+  const enregistrer = async () => {
+    if (!fLabel.trim() || !fValue.trim()) return
+    setSaving(true)
+    const { error } = await supabase.from('identifiants').insert({
+      user_id: session.user.id,
+      label: fLabel.trim(),
+      value: fValue.trim(),
+      theme: fTheme || 'Autres',
+    })
+    setSaving(false)
+    if (!error) {
+      setFLabel(''); setFValue(''); setFTheme('')
+      setShowForm(false)
+      charger()
     }
   }
 
@@ -46,17 +69,47 @@ export default function DirectNumeros({ session }) {
       <div style={s.header}>
         <button onClick={() => navigate('/')} style={s.back}>←</button>
         <div style={s.title}>Mes numéros</div>
+        <button onClick={() => setShowForm(v => !v)} style={s.addBtn}>
+          {showForm ? '✕' : '+ Ajouter'}
+        </button>
       </div>
 
       <div style={s.scroll}>
 
+        {showForm && (
+          <div style={s.form}>
+            <input
+              style={s.input}
+              placeholder="Libellé (ex. N° de sécu)"
+              value={fLabel}
+              onChange={e => setFLabel(e.target.value)} />
+            <input
+              style={s.input}
+              placeholder="Numéro / valeur"
+              value={fValue}
+              onChange={e => setFValue(e.target.value)} />
+            <select
+              style={s.input}
+              value={fTheme}
+              onChange={e => setFTheme(e.target.value)}>
+              <option value="">Choisir un thème…</option>
+              {THEMES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <button
+              style={{ ...s.saveBtn, opacity: (!fLabel.trim() || !fValue.trim() || saving) ? 0.5 : 1 }}
+              disabled={!fLabel.trim() || !fValue.trim() || saving}
+              onClick={enregistrer}>
+              {saving ? 'Enregistrement…' : 'Enregistrer'}
+            </button>
+          </div>
+        )}
+
         {loading && <div style={s.muted}>Chargement…</div>}
 
-        {!loading && numeros.length === 0 && (
+        {!loading && numeros.length === 0 && !showForm && (
           <div style={s.empty}>
-            Aucun numéro enregistré pour l'instant.<br />
-            Ajoute tes identifiants dans la table <strong>identifiants</strong> (Supabase),
-            et ils apparaîtront ici, prêts à copier.
+            Aucun numéro enregistré.<br />
+            Appuie sur « + Ajouter » en haut pour créer ton premier.
           </div>
         )}
 
@@ -95,8 +148,20 @@ const s = {
     background: 'white', border: '1px solid rgba(0,0,0,0.07)',
     color: '#534AB7', fontSize: '18px', cursor: 'pointer',
     display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: '18px', fontWeight: '700', color: '#1a1510' },
+  title: { fontSize: '18px', fontWeight: '700', color: '#1a1510', flex: 1 },
+  addBtn: { padding: '7px 12px', borderRadius: '9px',
+    border: '1px solid rgba(83,74,183,0.25)', background: 'rgba(83,74,183,0.08)',
+    color: '#534AB7', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
   scroll: { overflowY: 'auto', padding: '0 14px' },
+  form: { background: 'white', borderRadius: '12px', padding: '14px',
+    marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '10px',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.04)' },
+  input: { width: '100%', padding: '11px 12px', borderRadius: '10px',
+    border: '1px solid rgba(0,0,0,0.12)', fontSize: '15px',
+    fontFamily: 'system-ui, sans-serif', background: '#fafafa', boxSizing: 'border-box' },
+  saveBtn: { padding: '12px', borderRadius: '10px', border: 'none',
+    background: '#534AB7', color: 'white', fontSize: '14px',
+    fontWeight: '600', cursor: 'pointer' },
   muted: { color: '#bbb', fontSize: '13px', padding: '20px', textAlign: 'center' },
   empty: { color: '#888', fontSize: '13px', padding: '24px 12px',
     textAlign: 'center', lineHeight: '1.6' },
