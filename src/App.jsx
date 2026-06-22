@@ -17,6 +17,7 @@ import VoiceButton from './components/VoiceButton'
 import DirectNumeros from './pages/DirectNumeros'
 import DirectAppeler from './pages/DirectAppeler'
 import DirectAvenir from './pages/DirectAvenir'
+import ContratForm from './pages/ContratForm'
 
 // Détection immédiate du recovery au chargement
 const isRecoveryLink = window.location.hash.includes('type=recovery')
@@ -206,6 +207,7 @@ export default function App() {
         <Route path="/direct/numeros" element={session ? <DirectNumeros session={session} /> : <Navigate to="/" />} />
         <Route path="/direct/appeler" element={session ? <DirectAppeler session={session} /> : <Navigate to="/" />} />
         <Route path="/direct/avenir" element={session ? <DirectAvenir session={session} /> : <Navigate to="/" />} />
+        <Route path="/contrat/nouveau" element={session ? <ContratForm session={session} /> : <Navigate to="/" />} />
       </Routes>
 
       {/* Commande vocale */}
