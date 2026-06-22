@@ -3,67 +3,52 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BottomNav from '../components/BottomNav'
 
-// Ordre d'affichage des groupes (le plus urgent en premier)
-const URGENCES = ['imminent', 'à venir', 'passé']
-
-const URGENCE_LABEL = {
-  'imminent': 'Imminent',
-  'à venir': 'À venir',
-  'passé': 'Passé',
+const TYPE_LABEL = {
+  energie: 'Énergie',
+  telecom: 'Télécom',
+  mutuelle: 'Mutuelle',
+  assurance_auto: 'Assurance auto',
+  assurance_habitation: 'Assurance habitation',
+  autre: 'Autre',
 }
 
-// La vue renvoie une date ISO (AAAA-MM-JJ) ; on l'affiche en JJ/MM/AAAA.
-// Découpage de la chaîne (pas de new Date) pour éviter tout décalage de fuseau.
+// Date ISO (AAAA-MM-JJ) -> JJ/MM/AAAA, sans objet Date (pas de décalage de fuseau)
 const formatDate = (iso) => {
-  if (!iso) return ''
+  if (!iso) return '—'
   const [y, m, d] = iso.split('-')
   return `${d}/${m}/${y}`
 }
 
+// Urgence calculée à partir de la date limite de résiliation
+const urgenceDe = (iso) => {
+  if (!iso) return null
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const d = new Date(iso + 'T00:00:00')
+  const jours = Math.round((d - today) / 86400000)
+  if (jours < 0) return { label: 'Passé', color: '#bbb' }
+  if (jours <= 30) return { label: 'Imminent', color: '#854F0B' }
+  return { label: 'À venir', color: '#534AB7' }
+}
+
 export default function DirectAvenir({ session }) {
   const navigate = useNavigate()
-  const [echeances, setEcheances] = useState([])
+  const [contrats, setContrats] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // Lecture seule : on lit la VUE echeance (pas une table, donc pas d'insert).
+  // Un bloc par contrat : on lit directement la table (dates déjà calculées par Postgres).
   const charger = () => {
     supabase
-      .from('echeance')
-      .select('*')
-      .order('date_echeance', { ascending: true })
+      .from('contrat')
+      .select('id, type, organisme, date_limite_resiliation, date_renouvellement')
+      .eq('statut', 'actif')
+      .order('date_limite_resiliation', { ascending: true, nullsFirst: false })
       .then(({ data, error }) => {
-        if (!error && data) setEcheances(data)
+        if (!error && data) setContrats(data)
         setLoading(false)
       })
   }
 
   useEffect(() => { charger() }, [])
-
-  // Groupement par urgence (au lieu du thème)
-  const parUrgence = echeances.reduce((acc, e) => {
-    const u = e.urgence || 'à venir'
-    ;(acc[u] = acc[u] || []).push(e)
-    return acc
-  }, {})
-
-  // Action portée par la ligne : lien (résiliation / espace client) ou téléphone
-  const actionDe = (e) => {
-    if (e.lien_action) {
-      return {
-        type: 'lien',
-        href: e.lien_action,
-        label: e.nature === 'resiliation' ? 'Résilier' : 'Ouvrir',
-      }
-    }
-    if (e.tel_action) {
-      return {
-        type: 'tel',
-        href: `tel:${(e.tel_action || '').replace(/\s/g, '')}`,
-        label: 'Appeler',
-      }
-    }
-    return null
-  }
 
   return (
     <div style={s.container}>
@@ -78,37 +63,32 @@ export default function DirectAvenir({ session }) {
 
         {loading && <div style={s.muted}>Chargement…</div>}
 
-        {!loading && echeances.length === 0 && (
+        {!loading && contrats.length === 0 && (
           <div style={s.empty}>
-            Aucune échéance pour l'instant.<br />
-            Ajoute un contrat : ses dates clés apparaîtront ici toutes seules.
+            Aucun contrat pour l'instant.<br />
+            Ajoutes-en un avec « + Contrat ».
           </div>
         )}
 
-        {URGENCES.map((u) => {
-          const items = parUrgence[u]
-          if (!items || items.length === 0) return null
+        {contrats.map((c) => {
+          const u = urgenceDe(c.date_limite_resiliation)
           return (
-            <div key={u} style={s.group}>
-              <div style={{ ...s.groupTitle, ...(s.groupTitleByUrgence[u] || {}) }}>
-                {URGENCE_LABEL[u]}
+            <div key={c.id} style={s.card}>
+              <div style={s.cardTop}>
+                <span style={s.typeTag}>{TYPE_LABEL[c.type] || c.type}</span>
+                {u && <span style={{ ...s.urg, color: u.color }}>{u.label}</span>}
               </div>
-              {items.map((e) => {
-                const action = actionDe(e)
-                return (
-                  <div key={`${e.contrat_id}-${e.nature}-${e.date_echeance}`} style={s.row}>
-                    <div style={s.rowInfo}>
-                      <div style={s.rowName}>{e.titre}</div>
-                      <div style={s.rowMeta}>{formatDate(e.date_echeance)}</div>
-                    </div>
-                    {action && (
-                      action.type === 'tel'
-                        ? <a href={action.href} style={s.actionBtn}>{action.label}</a>
-                        : <a href={action.href} target="_blank" rel="noopener noreferrer" style={s.actionBtn}>{action.label}</a>
-                    )}
-                  </div>
-                )
-              })}
+              <div style={s.org}>{c.organisme}</div>
+              <div style={s.dateLine}>
+                <span style={s.dateLabel}>Résiliation avant le</span>
+                <span style={{ ...s.dateVal, color: u ? u.color : '#1a1510' }}>
+                  {formatDate(c.date_limite_resiliation)}
+                </span>
+              </div>
+              <div style={s.dateLine}>
+                <span style={s.dateLabel}>Fin de contrat</span>
+                <span style={s.dateVal}>{formatDate(c.date_renouvellement)}</span>
+              </div>
             </div>
           )
         })}
@@ -130,32 +110,24 @@ const s = {
     color: '#534AB7', fontSize: '18px', cursor: 'pointer',
     display: 'flex', alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: '18px', fontWeight: '700', color: '#1a1510', flex: 1 },
+  addBtn: { padding: '7px 12px', borderRadius: '9px',
+    border: '1px solid rgba(83,74,183,0.25)', background: 'rgba(83,74,183,0.08)',
+    color: '#534AB7', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
   scroll: { overflowY: 'auto', padding: '0 14px' },
   muted: { color: '#bbb', fontSize: '13px', padding: '20px', textAlign: 'center' },
   empty: { color: '#888', fontSize: '13px', padding: '24px 12px',
     textAlign: 'center', lineHeight: '1.6' },
-  group: { marginBottom: '18px' },
-  groupTitle: { fontSize: '11px', fontWeight: '700', color: '#999',
-    margin: '8px 0', textTransform: 'capitalize' },
-  groupTitleByUrgence: {
-    'imminent': { color: '#854F0B' },
-    'à venir': { color: '#534AB7' },
-    'passé': { color: '#bbb' },
-  },
-  row: { background: 'white', borderRadius: '12px', padding: '12px 14px',
-    marginBottom: '8px', display: 'flex', alignItems: 'center',
-    justifyContent: 'space-between', gap: '10px',
-    boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+  card: { background: 'white', borderRadius: '12px', padding: '12px 14px',
+    marginBottom: '8px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
     border: '1px solid rgba(0,0,0,0.04)' },
-  rowInfo: { flex: 1, minWidth: 0 },
-  rowName: { fontSize: '15px', fontWeight: '600', color: '#1a1510',
-    lineHeight: '1.35' },
-  rowMeta: { fontSize: '13px', color: '#666', marginTop: '4px', fontWeight: '500' },
-  actionBtn: { padding: '8px 14px', borderRadius: '9px',
-    border: '1px solid rgba(83,74,183,0.30)', background: 'rgba(83,74,183,0.08)',
-    color: '#534AB7', fontSize: '13px', fontWeight: '600',
-    textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' },
-  addBtn: { padding: '7px 12px', borderRadius: '9px',
-  border: '1px solid rgba(83,74,183,0.25)', background: 'rgba(83,74,183,0.08)',
-  color: '#534AB7', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },  
+  cardTop: { display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    marginBottom: '6px' },
+  typeTag: { fontSize: '11px', fontWeight: '700', color: '#534AB7',
+    background: 'rgba(83,74,183,0.08)', borderRadius: '6px', padding: '3px 8px' },
+  urg: { fontSize: '11px', fontWeight: '700' },
+  org: { fontSize: '15px', fontWeight: '600', color: '#1a1510', marginBottom: '8px' },
+  dateLine: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+    padding: '3px 0' },
+  dateLabel: { fontSize: '12px', color: '#888' },
+  dateVal: { fontSize: '14px', fontWeight: '600', color: '#1a1510' },
 }
