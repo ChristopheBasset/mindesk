@@ -71,6 +71,7 @@ export default function DirectAvenir({ session }) {
       <div style={s.header}>
         <button onClick={() => navigate('/')} style={s.back}>←</button>
         <div style={s.title}>À venir</div>
+        <button onClick={() => navigate('/contrat/nouveau')} style={s.addBtn}>+ Contrat</button>
       </div>
 
       <div style={s.scroll}>
@@ -154,4 +155,7 @@ const s = {
     border: '1px solid rgba(83,74,183,0.30)', background: 'rgba(83,74,183,0.08)',
     color: '#534AB7', fontSize: '13px', fontWeight: '600',
     textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' },
+  addBtn: { padding: '7px 12px', borderRadius: '9px',
+  border: '1px solid rgba(83,74,183,0.25)', background: 'rgba(83,74,183,0.08)',
+  color: '#534AB7', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },  
 }
